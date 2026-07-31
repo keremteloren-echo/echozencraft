@@ -228,7 +228,6 @@ function processNameInputs(reqFirstName, reqLastName, reqFullName) {
   return { firstName, lastName, fullName, formattedFullName };
 }
 
-// LOGO KONTROLÜ (.jpeg, .jpg ve .png destekler)
 function getLogoBase64() {
   const possibleLogos = ['logo.jpeg', 'logo.jpg', 'logo.png'];
   for (const logoName of possibleLogos) {
