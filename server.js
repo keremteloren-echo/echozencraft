@@ -265,11 +265,8 @@ async function generateAnalysisPDF(data) {
 </body>
 </html>`;
 
-  const execPath = await puppeteer.executablePath();
-
   const browser = await puppeteer.launch({
     headless: 'new',
-    executablePath: execPath,
     args: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
