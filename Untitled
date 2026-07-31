@@ -253,9 +253,9 @@ async function generateAnalysisPDF(data) {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, Arial, sans-serif; background-color: #F4F7F4; color: #1E2D24; padding: 12px; }
     .container { max-width: 780px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; padding: 18px 24px; border: 1.5px solid #2D5A42; }
-    .header { text-align: center; margin-bottom: 12px; }
-    .logo { max-width: 140px; height: auto; margin-bottom: 8px; }
-    .title-badge { background-color: #2D5A42; color: #FFFDF0; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 7px 18px; border-radius: 20px; display: inline-block; text-transform: uppercase; border: 2px solid #E6A100; }
+    .header { text-align: center; margin-bottom: 10px; }
+    .logo { max-width: 160px; height: auto; margin-bottom: 6px; }
+    .title-badge { background-color: #2D5A42; color: #FFFDF0; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 6px 16px; border-radius: 20px; display: inline-block; text-transform: uppercase; border: 2px solid #E6A100; }
     .info-card { background-color: #F0F6F2; border: 1px solid #B8D8C6; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
     .info-item { flex: 1 1 45%; }
     .info-label { font-size: 9px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 2px; }
@@ -276,8 +276,8 @@ async function generateAnalysisPDF(data) {
 <body>
   <div class="container">
     <div class="header">
-      ${logoBase64 ? `<img src="${logoBase64}" class="logo" alt="Echo Zen Craft Logo"><br>` : ''}
-      <div class="title-badge">ECHO ZEN CRAFT NUMEROLOJİ VE DOĞAL TAŞ UYUM RAPORU</div>
+      ${logoBase64 ? `<img src="${logoBase64}" class="logo" alt="Logo"><br>` : ''}
+      <div class="title-badge">KİŞİSEL NUMEROLOJİ VE ANALİZ RAPORU</div>
     </div>
 
     <div class="info-card">
