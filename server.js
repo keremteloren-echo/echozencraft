@@ -125,7 +125,6 @@ function calculateNameNumerology(fullName) {
   };
 }
 
-// METRİK ANLAMLARI SÖZLÜĞÜ (DOĞRU TANIMLAR)
 const NUMBER_DESCRIPTIONS = {
   1: "Liderlik, bağımsızlık, özgünlük ve cesaret yoludur.",
   2: "Birlikteliği öğrenme ve arabulucu olma dersi.",
@@ -141,7 +140,6 @@ const NUMBER_DESCRIPTIONS = {
   33: "Ruhsal uyanış ve kitlelere rehberlik etme yolu."
 };
 
-// DOĞAL TAŞ SÖZLÜĞÜ
 const NUMBER_STONES = {
   1: { name: 'KAPLAN GÖZÜ', color: 'Kahverengi/Sarı', element: 'Ateş' },
   2: { name: 'AY TAŞI', color: 'Beyaz / Yanardöner', element: 'Su' },
@@ -192,7 +190,7 @@ function generateFullAnalysis(fullName, birthDate, birthTime, intent) {
     { name: persStone.name, reason: `Kişilik Sayısı (${personality})`, color: persStone.color, element: persStone.element },
     { name: 'AY TAŞI', reason: `Yaşam Yolu (${lifePath}) & Güneş Burcu (${sunSign})`, color: 'Beyaz / Yanardöner', element: 'Su' },
     { name: risingStone.name, reason: `Yükselen Burç (${risingSign})`, color: risingStone.color, element: risingStone.element },
-    { name: 'KAPLAN GÖZÜ', reason: `Niyet Desteği (${intent || 'Bolluk, Bereket, Servet ve Zenginlik'})`, color: 'Kahverengi / Sarı', element: 'Ateş' }
+    { name: 'KAPLAN GÖZÜ', reason: `Niyet Desteği (${intent || 'bolluk'})`, color: 'Kahverengi / Sarı', element: 'Ateş' }
   ];
 
   return {
@@ -230,12 +228,22 @@ function processNameInputs(reqFirstName, reqLastName, reqFullName) {
   return { firstName, lastName, fullName, formattedFullName };
 }
 
-async function generateAnalysisPDF(data) {
-  const logoPath = path.join(__dirname, 'logo.png');
-  let logoBase64 = '';
-  if (fs.existsSync(logoPath)) {
-    logoBase64 = `data:image/png;base64,${fs.readFileSync(logoPath).toString('base64')}`;
+// LOGO KONTROLÜ (.jpeg, .jpg ve .png destekler)
+function getLogoBase64() {
+  const possibleLogos = ['logo.jpeg', 'logo.jpg', 'logo.png'];
+  for (const logoName of possibleLogos) {
+    const logoPath = path.join(__dirname, logoName);
+    if (fs.existsSync(logoPath)) {
+      const ext = path.extname(logoName).replace('.', '');
+      const mime = ext === 'jpg' ? 'jpeg' : ext;
+      return `data:image/${mime};base64,${fs.readFileSync(logoPath).toString('base64')}`;
+    }
   }
+  return '';
+}
+
+async function generateAnalysisPDF(data) {
+  const logoBase64 = getLogoBase64();
 
   const htmlContent = `<!DOCTYPE html>
 <html lang="tr">
@@ -247,7 +255,7 @@ async function generateAnalysisPDF(data) {
     body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, Arial, sans-serif; background-color: #F4F7F4; color: #1E2D24; padding: 12px; }
     .container { max-width: 780px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; padding: 18px 24px; border: 1.5px solid #2D5A42; }
     .header { text-align: center; margin-bottom: 10px; }
-    .logo { max-width: 180px; height: auto; margin-bottom: 4px; }
+    .logo { max-width: 160px; height: auto; margin-bottom: 6px; }
     .title-badge { background-color: #2D5A42; color: #FFFDF0; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 6px 16px; border-radius: 20px; display: inline-block; text-transform: uppercase; border: 2px solid #E6A100; }
     .info-card { background-color: #F0F6F2; border: 1px solid #B8D8C6; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
     .info-item { flex: 1 1 45%; }
@@ -336,7 +344,7 @@ async function generateAnalysisPDF(data) {
     <div class="note-box">
       <div class="note-title">Atölye Tasarım Notu</div>
       <div class="note-text">
-        Bu özel tasarım, haritanızdaki <strong>${data.analysis.sunSign}</strong> burcu ve <strong>${data.analysis.risingSign}</strong> yükselen enerjisi ile <strong>${data.analysis.lifePath}</strong> Yaşam Yolu sayınızın hem de "<strong>${data.intent || 'Bolluk, Bereket, Servet ve Zenginlik'}</strong>" niyetinizin frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur ve denge getirmesini dileriz.
+        Bu özel tasarım, haritanızdaki <strong>${data.analysis.sunSign}</strong> burcu ve <strong>${data.analysis.risingSign}</strong> yükselen enerjisi ile <strong>${data.analysis.lifePath}</strong> Yaşam Yolu sayınızın hem de "<strong>${data.intent || 'bolluk'}</strong>" niyetinizin frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur ve denge getirmesini dileriz.
       </div>
     </div>
   </div>

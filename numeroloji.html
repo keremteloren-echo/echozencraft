@@ -478,27 +478,37 @@
                     
                     if (analysis.matchedStones && analysis.matchedStones.length > 0) {
                         analysis.matchedStones.forEach(stone => {
-                            const style = getStoneStyle(stone.name);
+                            const stoneName = stone.name || stone.stoneName || stone;
+                            const stoneColor = stone.color ? ` (${stone.color})` : '';
+                            const style = getStoneStyle(stoneName);
+                            
                             const stoneCard = document.createElement('div');
                             stoneCard.className = 'stone-card';
                             stoneCard.style.cssText = `background-color: ${style.bg}; color: ${style.color};`;
 
                             stoneCard.innerHTML = `
                                 <span class="stone-color-dot" style="background-color: ${style.dot};"></span>
-                                <span>${stone.name} (${stone.color})</span>
+                                <span>${stoneName}${stoneColor}</span>
                             `;
                             stonesListDiv.appendChild(stoneCard);
                         });
+                    } else {
+                        stonesListDiv.innerHTML = '<p style="font-size: 13px; color: #666;">Analizle uyumlu taş verisi oluşturulamadı.</p>';
                     }
 
-                    let summaryText = `Güneş Burcu: ${analysis.sunSign || '-'}\n`;
+                    let summaryText = `Güneş Burcu: ${analysis.sunSign || 'Belirtilmedi'}\n`;
+                    
                     if (analysis.ascendant) {
-                        summaryText += `Yükselen Durumu: ${analysis.ascendant}\n`;
+                        summaryText += `Yükselen Burç: ${analysis.ascendant}\n`;
+                    } else {
+                        summaryText += `Yükselen Burç: Bilinmiyor (Sağlıklı hesaplama için doğum saati ve yeri girilmelidir)\n`;
                     }
+
                     if (analysis.intent) {
                         summaryText += `Seçilen Odak / Niyet: ${analysis.intent}\n`;
                     }
-                    summaryText += `\nAnlaşmalı Doğal Taşlar ve Frekans Analizi Başarıyla Tamamlandı.`;
+
+                    summaryText += `\nSizinle Rezonansa Giren Doğal Taşlar ve Frekans Analizi Başarıyla Tamamlandı.`;
 
                     document.getElementById('analysisContent').innerText = summaryText;
                     document.getElementById('resultsCard').classList.remove('hidden');
