@@ -1,3 +1,5 @@
 .env
-node_modules
-pdfsservice-account.json 
+node_modules/
+pdfsservice-account.json
+*.log
+.DS_Store
