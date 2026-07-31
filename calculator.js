@@ -17,12 +17,31 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
+        // Ad ve Soyad elemanlarını ayrı ayrı veya tek parça olarak alıyoruz
+        const firstNameElem = document.getElementById('firstName');
+        const lastNameElem = document.getElementById('lastName');
         const fullNameElem = document.getElementById('fullName');
-        const birthDateElem = document.getElementById('birthDate');
 
-        const fullName = fullNameElem ? fullNameElem.value : '';
+        let firstName = firstNameElem ? firstNameElem.value.trim() : '';
+        let lastName = lastNameElem ? lastNameElem.value.trim() : '';
+        let fullName = '';
+
+        if (firstName || lastName) {
+            fullName = `${firstName} ${lastName}`.trim();
+        } else if (fullNameElem) {
+            fullName = fullNameElem.value.trim();
+            // Eğer fullName input'u geldiyse ad/soyad olarak ayırmayı deneyelim
+            const parts = fullName.split(' ');
+            if (parts.length > 1) {
+                lastName = parts.pop();
+                firstName = parts.join(' ');
+            } else {
+                firstName = fullName;
+            }
+        }
         
         // Doğum tarihi ister tek inputtan ister ayrı açılır menülerden gelsin kontrol edelim
+        const birthDateElem = document.getElementById('birthDate');
         let birthDate = birthDateElem ? birthDateElem.value : '';
         if (!birthDate) {
           const day = document.getElementById('birthDay')?.value || '';
@@ -42,6 +61,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const trackingCode = generateTrackingCode();
 
         const requestPayload = {
+            firstName: firstName,
+            lastName: lastName,
             fullName: fullName,
             name: fullName,
             birthDate: birthDate,
@@ -109,6 +130,8 @@ document.addEventListener('DOMContentLoaded', function() {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
+                    firstName: firstName,
+                    lastName: lastName,
                     name: fullName,
                     birthDate: birthDate,
                     trackingCode: trackingCode

@@ -11,7 +11,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-// Google Drive ve OAuth 2.0 Bilgileri
+// Google Drive ve OAuth 2.0 Bilgileri (.env dosyasından çekilir)
 const DRIVE_FOLDER_ID = process.env.DRIVE_FOLDER_ID || '1c8RM6LkPgYTNJDOgHPvSy4EQ-WSm2rVZ';
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
@@ -59,6 +59,36 @@ app.use('/pdfs', express.static(pdfDir));
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'numeroloji.html'));
 });
+
+// Ad ve Soyadı akıllı ayrıştırma / birleştirme yardımcı fonksiyonu
+function processNameInputs(reqFirstName, reqLastName, reqFullName) {
+  let firstName = (reqFirstName || '').trim();
+  let lastName = (reqLastName || '').trim();
+
+  // Eğer ayrı isim-soyisim gelmediyse fakat fullName geldiyse ayırıyoruz
+  if (!firstName && !lastName && reqFullName) {
+    const parts = reqFullName.trim().split(/\s+/);
+    if (parts.length === 1) {
+      firstName = parts[0];
+      lastName = '';
+    } else {
+      lastName = parts.pop();
+      firstName = parts.join(' ');
+    }
+  }
+
+  const fullName = `${firstName} ${lastName}`.trim() || 'Sıla YAVUZ';
+  const formattedFullName = lastName 
+    ? `${firstName} ${lastName.toUpperCase()}`
+    : firstName;
+
+  return {
+    firstName,
+    lastName,
+    fullName,
+    formattedFullName
+  };
+}
 
 async function generateAnalysisPDF(data) {
   const logoPath = path.join(__dirname, 'logo.png');
@@ -202,7 +232,7 @@ async function generateAnalysisPDF(data) {
     <div class="info-card">
       <div class="info-item">
         <div class="info-label">Müşteri Adı Soyadı</div>
-        <div class="info-value">${data.fullName || 'Sıla YAVUZ'}</div>
+        <div class="info-value">${data.formattedFullName || 'Sıla YAVUZ'}</div>
       </div>
       <div class="info-item">
         <div class="info-label">Doğum Bilgileri</div>
@@ -265,7 +295,6 @@ async function generateAnalysisPDF(data) {
 </body>
 </html>`;
 
-  // Yerel dizindeki Chrome önbelleğini hedefle
   process.env.PUPPETEER_CACHE_DIR = path.join(__dirname, '.cache', 'puppeteer');
 
   const browser = await puppeteer.launch({
@@ -282,7 +311,16 @@ async function generateAnalysisPDF(data) {
 
   await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
 
-  const safeName = (data.fullName || 'Sila_YAVUZ').replace(/[^a-zA-Z0-9]/g, '_');
+  // Dosya adında Türkçe karakter veya geçersiz simge kalmaması için güvenli temizleme
+  const safeName = (data.fullName || 'Sila_YAVUZ')
+    .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
+    .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+    .replace(/ş/g, 's').replace(/Ş/g, 'S')
+    .replace(/ı/g, 'i').replace(/İ/g, 'I')
+    .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+    .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+    .replace(/[^a-zA-Z0-9]/g, '_');
+
   const fileName = `Rapor_${safeName}_${data.trackingCode}.pdf`;
   const filePath = path.join(pdfDir, fileName);
 
@@ -299,8 +337,12 @@ async function generateAnalysisPDF(data) {
 
 app.post('/api/v1/calculate', async (req, res) => {
   try {
-    const { fullName, birthDate, birthTime, birthPlace, intent, trackingCode } = req.body;
+    const { firstName: reqFirstName, lastName: reqLastName, fullName: reqFullName, birthDate, birthTime, birthPlace, intent, trackingCode } = req.body;
+    
     const generatedCode = trackingCode || Math.floor(100000 + Math.random() * 900000).toString();
+
+    // Ad ve soyadı hem ayrı ayrı hem birleştirilmiş formatlarda düzenliyoruz
+    const nameData = processNameInputs(reqFirstName, reqLastName, reqFullName);
 
     const mockAnalysis = {
       destiny: 1,
@@ -319,7 +361,10 @@ app.post('/api/v1/calculate', async (req, res) => {
     };
 
     const reportData = {
-      fullName,
+      fullName: nameData.fullName,
+      firstName: nameData.firstName,
+      lastName: nameData.lastName,
+      formattedFullName: nameData.formattedFullName,
       birthDate,
       birthTime,
       birthPlace,
@@ -328,6 +373,7 @@ app.post('/api/v1/calculate', async (req, res) => {
       analysis: mockAnalysis
     };
 
+    // Arka planda PDF oluşturup Google Drive'a yüklüyoruz
     (async () => {
       try {
         const { filePath, fileName } = await generateAnalysisPDF(reportData);
@@ -350,6 +396,13 @@ app.post('/api/v1/calculate', async (req, res) => {
     console.error('Hesaplama Genel Hata:', error);
     return res.status(500).json({ success: false, error: 'Hesaplama sırasında bir hata oluştu.' });
   }
+});
+
+// İkincil bildirim/mail endpoint'i
+app.post('/api/numeroloji', (req, res) => {
+  const { firstName, lastName, name, birthDate, trackingCode } = req.body;
+  console.log(`[Bildirim] Yeni numeroloji kaydı alındı: ${firstName || name} ${lastName || ''} - Kod: ${trackingCode}`);
+  return res.status(200).json({ success: true, message: 'Bildirim kaydedildi.' });
 });
 
 const PORT = process.env.PORT || 3000;
