@@ -1,0 +1,73 @@
+{
+  "records": [
+    {
+      "id": "1785334617483",
+      "code": "818081",
+      "createdAt": "2026-07-29T14:16:57.483Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "kerem telören",
+        "email": "keremteloren@gmail.com",
+        "birthDate": "1972-03-30",
+        "birthTime": "01:35",
+        "birthPlace": "üsküdar"
+      },
+      "intent": "mutluluk",
+      "analysis": {
+        "summary": {
+          "lifePathNumber": 7,
+          "expressionNumber": 6,
+          "soulUrgeNumber": 8,
+          "personalityNumber": 7,
+          "sunSign": "Koç",
+          "ascendantSign": "Oğlak"
+        },
+        "destiny": 6,
+        "soulUrge": 8,
+        "personality": 7,
+        "lifePath": 7,
+        "sunSign": "Koç",
+        "ascendant": "Oğlak",
+        "intent": "İçsel Mutluluk, Neşe ve Yaşam Sevinci",
+        "matchedStones": [
+          {
+            "name": "PEMBE KUVARS",
+            "color": "Pembe",
+            "element": "Hava",
+            "reason": "Kader Sayısı (6)"
+          },
+          {
+            "name": "HEMATİT",
+            "color": "Metalik Gri",
+            "element": "Ateş",
+            "reason": "Ruh Güdüsü Sayısı (8)"
+          },
+          {
+            "name": "SODALİT",
+            "color": "Mavi / Mor",
+            "element": "Su",
+            "reason": "Kişilik Sayısı (7) & Yaşam Yolu (7)"
+          },
+          {
+            "name": "AKİK",
+            "color": "Kırmızı / Kahverengi",
+            "element": "Ateş",
+            "reason": "Güneş Burcu (Koç)"
+          },
+          {
+            "name": "LAV TAŞI",
+            "color": "Siyah",
+            "element": "Toprak",
+            "reason": "Yükselen Burç (Oğlak)"
+          },
+          {
+            "name": "AMAZONİT",
+            "color": "Yeşilimsi Mavi",
+            "element": "Su",
+            "reason": "Niyet Desteği (İçsel Mutluluk, Neşe ve Yaşam Sevinci)"
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo Zen Craft - Numeroloji & Doğal Taş Analizi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Sadece Numeroloji Sayfasına Özel Eleman Stilleri */
+        .main-content {
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            flex-grow: 1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 680px;
+        }
+
+        .header-title {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header-title h1 {
+            color: var(--accent-green, #4a5d3f);
+            font-family: var(--font-heading, 'Cormorant Garamond', serif);
+            font-size: 2.4rem;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            color: var(--text-muted, #5a6555);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .form-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 35px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+            border: 6px solid #e0d5c1;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--text-dark, #2c3527);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0d5c1;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            background-color: #fff;
+            outline: none;
+            color: var(--text-dark, #2c3527);
+            font-family: var(--font-body, 'Plus Jakarta Sans', sans-serif);
+        }
+
+        .form-control:focus {
+            border-color: var(--accent-green, #4a5d3f);
+        }
+
+        .row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            background-color: var(--accent-green, #4a5d3f);
+            color: #ffffff;
+            border: none;
+            padding: 14px;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #38472f;
+            transform: translateY(-2px);
+        }
+
+        .hidden { display: none; }
+
+        .code-box {
+            background: #fdfbf7;
+            border: 2px dashed var(--accent-green, #4a5d3f);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .code-box h4 { color: var(--accent-green, #4a5d3f); margin: 0 0 5px 0; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+        .code-box .code-text { font-size: 36px; color: var(--text-dark, #2c3527); margin: 5px 0; font-weight: 800; letter-spacing: 3px; }
+        .code-box small { color: var(--text-muted, #5a6555); font-size: 13px; }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        .result-box {
+            background: #f7f5f0;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            border-left: 4px solid var(--accent-green, #4a5d3f);
+        }
+        .result-box h4 { margin: 0 0 5px 0; color: var(--text-dark, #2c3527); font-size: 12px; text-transform: uppercase; }
+        .result-box p { margin: 0; font-size: 22px; font-weight: bold; color: var(--accent-green, #4a5d3f); }
+
+        .stones-list { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .stone-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+            border: 1px solid rgba(0,0,0,0.06);
+        }
+        .stone-color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            border: 1px solid rgba(0,0,0,0.15);
+        }
+
+        .analysis-text {
+            line-height: 1.7;
+            white-space: pre-line;
+            background: #fdfbf7;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e0d5c1;
+            font-size: 14px;
+            color: var(--text-dark, #2c3527);
+        }
+
+        .workshop-note {
+            background-color: #fdfbf7;
+            border: 2px solid #e0d5c1;
+            border-radius: 16px;
+            padding: 25px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        .workshop-note h4 { margin: 0 0 10px 0; color: var(--accent-green, #4a5d3f); font-family: var(--font-heading, 'Cormorant Garamond', serif); font-size: 22px; }
+        .workshop-note p { margin: 0 0 20px 0; font-size: 14px; color: var(--text-muted, #5a6555); line-height: 1.6; }
+
+        .btn-shopier {
+            display: inline-block;
+            width: 100%;
+            text-align: center;
+            background: var(--accent-green, #4a5d3f);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 20px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(74, 93, 63, 0.2);
+            transition: all 0.3s ease;
+        }
+        .btn-shopier:hover { background: #38472f; transform: translateY(-2px); }
+
+        @media (max-width: 600px) {
+            .row-3, .row-2 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navigasyon -->
+    <header>
+        <a href="index.html" class="logo-container">
+            <img src="assets/images/logo.jpeg" alt="Echo Zen Craft Logo" class="logo">
+            <span class="brand-title">Echo Zen Craft</span>
+        </a>
+        <nav>
+            <ul>
+                <li><a href="index.html">Ana Sayfa</a></li>
+                <li><a href="hakkimizda.html">Hakkımızda</a></li>
+                <li><a href="numeroloji.html" class="active">Numeroloji Analizi</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="main-content">
+        <div class="container">
+            
+            <div class="header-title">
+                <h1>Echo Zen Craft</h1>
+                <p>Kişisel Numeroloji ve Doğal Taş Analiz Portalı</p>
+            </div>
+
+            <!-- Analiz Formu -->
+            <div class="form-card">
+                <form id="analysisForm">
+                    <div class="form-group">
+                        <label for="fullName">Ad Soyad (Doğum Anındaki):</label>
+                        <input type="text" id="fullName" class="form-control" placeholder="Örn: Ayşe Yılmaz" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Doğum Tarihi (Gün / Ay / Yıl):</label>
+                        <div class="row-3">
+                            <select id="birthDay" class="form-control" required>
+                                <option value="">Gün</option>
+                            </select>
+                            <select id="birthMonth" class="form-control" required>
+                                <option value="">Ay</option>
+                                <option value="01">Ocak</option>
+                                <option value="02">Şubat</option>
+                                <option value="03">Mart</option>
+                                <option value="04">Nisan</option>
+                                <option value="05">Mayıs</option>
+                                <option value="06">Haziran</option>
+                                <option value="07">Temmuz</option>
+                                <option value="08">Ağustos</option>
+                                <option value="09">Eylül</option>
+                                <option value="10">Ekim</option>
+                                <option value="11">Kasım</option>
+                                <option value="12">Aralık</option>
+                            </select>
+                            <select id="birthYear" class="form-control" required>
+                                <option value="">Yıl</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Doğum Saati (Opsiyonel):</label>
+                        <div class="row-2">
+                            <select id="birthHour" class="form-control">
+                                <option value="">Saat Seçiniz</option>
+                            </select>
+                            <select id="birthMinute" class="form-control">
+                                <option value="">Dakika Seçiniz</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="birthPlace">Doğum Yeri / Şehir (Opsiyonel):</label>
+                        <input type="text" id="birthPlace" class="form-control" placeholder="Örn: İstanbul">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="intent">Niyet/Odak Alanı:</label>
+                        <select id="intent" class="form-control">
+                            <option value="mutluluk">İçsel Mutluluk & Neşe</option>
+                            <option value="ask">Aşk & İlişkiler</option>
+                            <option value="bolluk">Bolluk & Bereket</option>
+                            <option value="kariyer">Kariyer & Başarı</option>
+                            <option value="huzur">İçsel Huzur & Stres Yönetimi</option>
+                            <option value="pozitif_enerji">Pozitif Enerji & İyimserlik</option>
+                            <option value="koruma">Nazar & Negatif Enerji Kalkanı</option>
+                            <option value="ozguven">Özgüven & Cesaret</option>
+                            <option value="sezgi">Sezgi & İçsel Bilgelik</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" id="submitBtn" class="btn-submit">Analizimi Oluştur</button>
+                </form>
+            </div>
+
+            <!-- Sonuç Ekranı -->
+            <div id="resultsCard" class="form-card hidden">
+                <div class="code-box">
+                    <h4>SİPARİŞ ANALİZ KODUNUZ</h4>
+                    <div id="displayAnalysisCode" class="code-text">-</div>
+                    <small>Sipariş verirken bu kodu Shopier "Sipariş Notu" kısmına yazınız.</small>
+                </div>
+
+                <h2 style="color: #4a5d3f; margin-top: 0; font-size: 22px; font-family: 'Cormorant Garamond', serif;">Kişisel Analiz Sonuçlarınız</h2>
+                
+                <div class="results-grid">
+                    <div class="result-box">
+                        <h4>Kader Sayısı</h4>
+                        <p id="destinyNumber">-</p>
+                    </div>
+                    <div class="result-box">
+                        <h4>Ruh Güdüsü</h4>
+                        <p id="soulUrge">-</p>
+                    </div>
+                    <div class="result-box">
+                        <h4>Kişilik Sayısı</h4>
+                        <p id="personalityNumber">-</p>
+                    </div>
+                    <div class="result-box">
+                        <h4>Yaşam Yolu</h4>
+                        <p id="lifePath">-</p>
+                    </div>
+                </div>
+
+                <h3 style="color: #4a5d3f; margin-top: 25px; font-size: 18px; font-family: 'Cormorant Garamond', serif;">Ruhsal & Astrolojik Rezonans Taşlarınız</h3>
+                <div id="stonesList" class="stones-list"></div>
+
+                <h3 style="color: #4a5d3f; margin-top: 25px; font-size: 18px; font-family: 'Cormorant Garamond', serif;">Harita Detay Analizi</h3>
+                <div id="analysisContent" class="analysis-text"></div>
+
+                <div class="workshop-note">
+                    <h4>✨ Atölyemizden Size Özel Tasarım ✨</h4>
+                    <p>
+                        Hesaplanan frekans değerleriniz ve niyetiniz doğrultusunda, yukarıdaki doğal taşlar atölyemizde sizin adınıza özenle dizilerek kişiselleştirilmiş enerji bilekliğiniz/halhalınız hazırlanır. Siparişinizle birlikte detaylı <strong>Analiz Raporunuzun QR Kodlu Basılı Kartı</strong> hediyemiz olarak paketinize eklenir.
+                    </p>
+                    
+                    <a id="shopierLinkBtn" href="https://www.shopier.com/echozencraft/49373371" target="_blank" class="btn-shopier">
+                        🛍️ Bu Analize Özel Bilekliğimi / Halhalımı Sipariş Et
+                    </a>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <a href="index.html" style="color: #4a5d3f; text-decoration: none; font-size: 14px; font-weight: 600;">&larr; Ana Sayfaya Dön</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <h3>Echo Zen Craft</h3>
+            <p>Zihin, Beden ve Zanaatın Dengesi</p>
+            <p>
+                <a href="https://www.instagram.com/echozencraft" target="_blank" rel="noopener noreferrer" style="color: #e0d5c1; text-decoration: none; font-weight: 600;">
+                    📸 Instagram: @echozencraft
+                </a>
+            </p>
+            <p class="copyright">&copy; 2026 Echo Zen Craft. Tüm Hakları Saklıdır.</p>
+        </div>
+    </footer>
+
+    <script>
+        const BASE_SHOPIER_URL = "https://www.shopier.com/echozencraft/49373371";
+
+        const STONE_STYLES = {
+            'AMAZONİT':     { bg: '#E0F2F1', color: '#004D40', dot: '#4DB6AC' },
+            'AKİK':         { bg: '#FFEBEE', color: '#B71C1C', dot: '#E57373' },
+            'AY TAŞI':      { bg: '#F5F5F5', color: '#424242', dot: '#E0E0E0' },
+            'YEŞİM':        { bg: '#E8F5E9', color: '#1B5E20', dot: '#81C784' },
+            'PEMBE KUVARS': { bg: '#FCE4EC', color: '#880E4F', dot: '#F06292' },
+            'SODALİT':      { bg: '#E8EAF6', color: '#1A237E', dot: '#7986CB' },
+            'HEMATİT':      { bg: '#ECEFF1', color: '#263238', dot: '#90A4AE' },
+            'LAPİS':        { bg: '#E3F2FD', color: '#0D47A1', dot: '#64B5F6' },
+            'KAPLAN':       { bg: '#FFF8E1', color: '#E65100', dot: '#FFB74D' },
+            'FİRUZE':       { bg: '#E0F7FA', color: '#006064', dot: '#4DD0E1' },
+            'ZÜMRÜT':       { bg: '#E8F5E9', color: '#004D40', dot: '#4CAF50' },
+            'YAKUT':        { bg: '#FFEBEE', color: '#880E4F', dot: '#C2185B' },
+            'AMETRİN':      { bg: '#F3E5F5', color: '#4A148C', dot: '#BA68C8' },
+            'UNAKİT':       { bg: '#F1F8E9', color: '#33691E', dot: '#AED581' },
+            'MALAHİT':      { bg: '#E8F5E9', color: '#1B5E20', dot: '#2E7D32' },
+            'PERU OPAL':    { bg: '#E0F7FA', color: '#00838F', dot: '#26C6DA' },
+            'AZURİT':       { bg: '#E8EAF6', color: '#1A237E', dot: '#3F51B5' },
+            'KUNZİT':       { bg: '#FCE4EC', color: '#880E4F', dot: '#EC407A' },
+            'LAV':          { bg: '#E0E0E0', color: '#212121', dot: '#616161' }
+        };
+
+        function generateNumericCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        function getStoneStyle(stoneName) {
+            if (!stoneName) return { bg: '#F0F6F2', color: '#2C3531', dot: '#2D5A43' };
+            const name = stoneName.toLocaleUpperCase('tr-TR');
+            const key = Object.keys(STONE_STYLES).find(k => name.includes(k));
+            return key ? STONE_STYLES[key] : { bg: '#F0F6F2', color: '#2C3531', dot: '#2D5A43' };
+        }
+
+        function populateSelect(selectId, start, end, step = 1, padLength = 2, suffix = '') {
+            const select = document.getElementById(selectId);
+            let options = select.innerHTML;
+            for (let i = start; step > 0 ? i <= end : i >= end; i += step) {
+                const val = String(i).padStart(padLength, '0');
+                options += `<option value="${val}">${val}${suffix}</option>`;
+            }
+            select.innerHTML = options;
+        }
+
+        populateSelect('birthDay', 1, 31);
+        populateSelect('birthYear', 2026, 1930, -1, 4);
+        populateSelect('birthHour', 0, 23, 1, 2, ':00');
+        populateSelect('birthMinute', 0, 59, 5);
+
+        document.getElementById('analysisForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = 'Analiz Hesaplanıyor...';
+            submitBtn.disabled = true;
+
+            const day = document.getElementById('birthDay').value;
+            const month = document.getElementById('birthMonth').value;
+            const year = document.getElementById('birthYear').value;
+            const hour = document.getElementById('birthHour').value;
+            const minute = document.getElementById('birthMinute').value;
+
+            const formData = {
+                fullName: document.getElementById('fullName').value,
+                birthDate: `${year}-${month}-${day}`,
+                birthTime: (hour && minute) ? `${hour.replace(':00', '')}:${minute}` : '',
+                birthPlace: document.getElementById('birthPlace').value,
+                intent: document.getElementById('intent').value
+            };
+
+            const apiUrl = '/api/v1/calculate';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    const analysis = data.analysis;
+                    const generatedCode = data.analysisCode || generateNumericCode();
+                    
+                    document.getElementById('displayAnalysisCode').innerText = generatedCode;
+                    document.getElementById('shopierLinkBtn').href = `${BASE_SHOPIER_URL}?code=${generatedCode}`;
+
+                    document.getElementById('destinyNumber').innerText = analysis.destiny ?? '-';
+                    document.getElementById('soulUrge').innerText = analysis.soulUrge ?? '-';
+                    document.getElementById('personalityNumber').innerText = analysis.personality ?? '-';
+                    document.getElementById('lifePath').innerText = analysis.lifePath ?? '-';
+                    
+                    const stonesListDiv = document.getElementById('stonesList');
+                    stonesListDiv.innerHTML = '';
+                    
+                    if (analysis.matchedStones && analysis.matchedStones.length > 0) {
+                        analysis.matchedStones.forEach(stone => {
+                            const style = getStoneStyle(stone.name);
+                            const stoneCard = document.createElement('div');
+                            stoneCard.className = 'stone-card';
+                            stoneCard.style.cssText = `background-color: ${style.bg}; color: ${style.color};`;
+
+                            stoneCard.innerHTML = `
+                                <span class="stone-color-dot" style="background-color: ${style.dot};"></span>
+                                <span>${stone.name} (${stone.color})</span>
+                            `;
+                            stonesListDiv.appendChild(stoneCard);
+                        });
+                    }
+
+                    let summaryText = `Güneş Burcu: ${analysis.sunSign || '-'}\n`;
+                    if (analysis.ascendant) {
+                        summaryText += `Yükselen Durumu: ${analysis.ascendant}\n`;
+                    }
+                    if (analysis.intent) {
+                        summaryText += `Seçilen Odak / Niyet: ${analysis.intent}\n`;
+                    }
+                    summaryText += `\nAnlaşmalı Doğal Taşlar ve Frekans Analizi Başarıyla Tamamlandı.`;
+
+                    document.getElementById('analysisContent').innerText = summaryText;
+                    document.getElementById('resultsCard').classList.remove('hidden');
+                    document.getElementById('resultsCard').scrollIntoView({ behavior: 'smooth' });
+
+                } else {
+                    alert('Bir hata oluştu: ' + (data.error || 'Bilinmeyen hata'));
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Sunucuya bağlanırken bir sorun oluştu. Lütfen bağlantınızı veya sunucuyu kontrol edin.');
+            } finally {
+                submitBtn.innerText = 'Analizimi Oluştur';
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+
+</body>
+</html>
