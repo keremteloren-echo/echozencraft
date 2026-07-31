@@ -47,7 +47,6 @@ async function uploadToDrive(filePath, fileName) {
   return response.data.id;
 }
 
-// PDF yerel dizin kontrolü
 const pdfDir = path.join(__dirname, 'pdfs');
 if (!fs.existsSync(pdfDir)) {
   fs.mkdirSync(pdfDir, { recursive: true });
@@ -61,7 +60,6 @@ app.get('/', (req, res) => {
 
 // --- DİNAMİK HESAPLAMA MOTORU ---
 
-// Türkçe Karakter Temizleme
 function trToEn(text) {
   return (text || '')
     .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
@@ -72,7 +70,6 @@ function trToEn(text) {
     .replace(/ç/g, 'c').replace(/Ç/g, 'C');
 }
 
-// Rakam Tekhaneye/Üstat Sayıya İndirgeme
 function reduceNumber(num, keepMaster = true) {
   while (num > 9) {
     if (keepMaster && (num === 11 || num === 22 || num === 33)) break;
@@ -103,20 +100,17 @@ function calculateSunSign(birthDateStr) {
   return 'Aslan';
 }
 
-// DİNAMİK YÜKSELEN BURÇ HESAPLAMA (Yerel Saat Yaklaşımı)
+// Yükselen Burç Hesaplama
 function calculateRisingSign(birthDateStr, birthTimeStr) {
-  if (!birthTimeStr) return 'Belirtilmedi';
+  if (!birthTimeStr) return 'Akrep';
 
   const signs = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
-  
   const [hours, minutes] = birthTimeStr.split(':').map(Number);
   const timeInHours = hours + (minutes || 0) / 60;
 
   const sunSign = calculateSunSign(birthDateStr);
   const sunIndex = signs.indexOf(sunSign);
 
-  // Güneş yaklaşık 06:00'da doğar ve Güneş burcu ufukta yükselir.
-  // Her 2 saatte bir yükselen burç 1 burç ilerler (30 derece).
   let hoursSinceSunrise = timeInHours - 6;
   if (hoursSinceSunrise < 0) hoursSinceSunrise += 24;
 
@@ -134,7 +128,7 @@ function calculateLifePath(birthDateStr) {
   return reduceNumber(sum);
 }
 
-// Isim Numerolojisi Hesaplama
+// İsim Numerolojisi
 function calculateNameNumerology(fullName) {
   const charValues = {
     a:1, j:1, s:1, ş:1, b:2, k:2, t:2, c:3, ç:3, l:3, u:3, ü:3,
@@ -166,36 +160,64 @@ function calculateNameNumerology(fullName) {
   };
 }
 
-// Burçlara Göre Taş Haritası
-const BURC_TASLARI = {
-  'Koç': { name: 'AKİK', color: 'Kırmızı', element: 'Ateş' },
+// 1. NUMEROLOJİ SAYI TAŞLARI (Her Sayı İçin Özgün Taş)
+const NUMBER_STONES = {
+  1: { name: 'GÜNEŞ TAŞI', color: 'Turuncu/Işıltılı', element: 'Ateş' },
+  2: { name: 'AY TAŞI', color: 'Beyaz/Yanardöner', element: 'Su' },
+  3: { name: 'AMAZONİT', color: 'Yeşilimsi Mavi', element: 'Su' },
+  4: { name: 'LAV TAŞI', color: 'Siyah', element: 'Toprak' },
+  5: { name: 'FİRUZE', color: 'Mavi/Yeşil', element: 'Hava' },
+  6: { name: 'PEMBE KUVARS', color: 'Pembe', element: 'Su' },
+  7: { name: 'AMETİST', color: 'Mor', element: 'Hava' },
+  8: { name: 'HEMATİT', color: 'Metalik Gri', element: 'Toprak' },
+  9: { name: 'LABRADORİT', color: 'Mavi/Gri Işıltılı', element: 'Hava' },
+  11: { name: 'AMETRİN', color: 'Mor/Sarı', element: 'Hava' },
+  22: { name: 'KAPLAN GÖZÜ', color: 'Kahverengi/Sarı', element: 'Ateş' },
+  33: { name: 'SELONİT / MOZANİT', color: 'Beyaz/Şeffaf', element: 'Hava' }
+};
+
+// 2. ASTROLOJİ BURÇ TAŞLARI
+const ZODIAC_STONES = {
+  'Koç': { name: 'KIRMIZI AKİK', color: 'Kırmızı', element: 'Ateş' },
   'Boğa': { name: 'YEŞİM', color: 'Yeşil', element: 'Toprak' },
-  'İkizler': { name: 'AMETRİN', color: 'Mor/Sarı', element: 'Hava' },
-  'Yengeç': { name: 'AY TAŞI', color: 'Beyaz/Işıltılı', element: 'Su' },
+  'İkizler': { name: 'SİTRİN', color: 'Sarı/Altın', element: 'Hava' },
+  'Yengeç': { name: 'AY TAŞI', color: 'Beyaz', element: 'Su' },
   'Aslan': { name: 'KAPLAN GÖZÜ', color: 'Kahverengi/Altın', element: 'Ateş' },
-  'Başak': { name: 'AMAZONİT', color: 'Yeşil/Mavi', element: 'Toprak' },
+  'Başak': { name: 'MOS AKİK', color: 'Yeşil/Toprak', element: 'Toprak' },
   'Terazi': { name: 'LAPİS LAZULİ', color: 'Lacivert', element: 'Hava' },
   'Akrep': { name: 'MALAHİT', color: 'Koyu Yeşil', element: 'Su' },
   'Yay': { name: 'SODALİT', color: 'Mavi', element: 'Ateş' },
-  'Oğlak': { name: 'HEMATİT', color: 'Metalik Gri', element: 'Toprak' },
-  'Kova': { name: 'FİRUZE', color: 'Mavi/Yeşil', element: 'Hava' },
-  'Balık': { name: 'PEMBE KUVARS', color: 'Pembe', element: 'Su' }
+  'Oğlak': { name: 'ONİKS', color: 'Siyah', element: 'Toprak' },
+  'Kova': { name: 'AQUAMARİNE', color: 'Açık Mavi', element: 'Hava' },
+  'Balık': { name: 'AMETİST', color: 'Mor', element: 'Su' }
 };
 
-// Tam Dinamik Analiz Üretici
+// Tam 7 Taşlı Analiz Üretici
 function generateFullAnalysis(fullName, birthDate, birthTime, intent) {
   const sunSign = calculateSunSign(birthDate);
   const risingSign = calculateRisingSign(birthDate, birthTime);
   const lifePath = calculateLifePath(birthDate);
   const { destiny, soulUrge, personality } = calculateNameNumerology(fullName);
 
-  const burcTasi = BURC_TASLARI[sunSign] || { name: 'KAPLAN GÖZÜ', color: 'Sarı/Kahve', element: 'Ateş' };
+  const getNumStone = (num) => NUMBER_STONES[num] || { name: 'KUVARS', color: 'Şeffaf', element: 'Hava' };
+  const getZodiacStone = (sign) => ZODIAC_STONES[sign] || { name: 'KAPLAN GÖZÜ', color: 'Sarı/Kahve', element: 'Ateş' };
 
+  const destStone = getNumStone(destiny);
+  const soulStone = getNumStone(soulUrge);
+  const persStone = getNumStone(personality);
+  const lifeStone = getNumStone(lifePath);
+  const sunStone = getZodiacStone(sunSign);
+  const risingStone = getZodiacStone(risingSign);
+
+  // 7 TAŞLIK EKSİKSİZ KOLEKSİYON
   const matchedStones = [
-    { name: burcTasi.name, reason: `Güneş Burcu (${sunSign})`, color: burcTasi.color, element: burcTasi.element },
-    { name: 'FİRUZE', reason: `Kader Sayısı (${destiny}) & Kişilik (${personality})`, color: 'Mavi/Yeşil', element: 'Hava' },
-    { name: 'AMETRİN', reason: `Yaşam Yolu Sayısı (${lifePath})`, color: 'Mor/Sarı', element: 'Hava' },
-    { name: 'AMAZONİT', reason: `Niyet Desteği (${intent || 'İçsel Denge & Bolluk'})`, color: 'Yeşilimsi Mavi', element: 'Su' }
+    { name: destStone.name, reason: `Kader Sayısı (${destiny})`, color: destStone.color, element: destStone.element },
+    { name: soulStone.name, reason: `Ruh Güdüsü Sayısı (${soulUrge})`, color: soulStone.color, element: soulStone.element },
+    { name: persStone.name, reason: `Kişilik Sayısı (${personality})`, color: persStone.color, element: persStone.element },
+    { name: lifeStone.name, reason: `Yaşam Yolu Sayısı (${lifePath})`, color: lifeStone.color, element: lifeStone.element },
+    { name: sunStone.name, reason: `Güneş Burcu (${sunSign})`, color: sunStone.color, element: sunStone.element },
+    { name: risingStone.name, reason: `Yükselen Burç (${risingSign})`, color: risingStone.color, element: risingStone.element },
+    { name: 'KAPLAN GÖZÜ / AVANTURİN', reason: `Niyet Desteği (${intent || 'Bolluk ve Bereket'})`, color: 'Yeşil / Sarı', element: 'Ateş' }
   ];
 
   return {
@@ -209,7 +231,6 @@ function generateFullAnalysis(fullName, birthDate, birthTime, intent) {
   };
 }
 
-// Input İşleyici
 function processNameInputs(reqFirstName, reqLastName, reqFullName) {
   let firstName = (reqFirstName || '').trim();
   let lastName = (reqLastName || '').trim();
@@ -250,23 +271,23 @@ async function generateAnalysisPDF(data) {
     body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, Arial, sans-serif; background-color: #F4F7F4; color: #1E2D24; padding: 12px; }
     .container { max-width: 780px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; padding: 18px 24px; border: 1.5px solid #2D5A42; }
     .header { text-align: center; margin-bottom: 10px; }
-    .logo { max-width: 240px; height: auto; margin-bottom: 4px; }
-    .title-badge { background-color: #2D5A42; color: #FFFDF0; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 7px 18px; border-radius: 20px; display: inline-block; text-transform: uppercase; border: 2px solid #E6A100; }
+    .logo { max-width: 220px; height: auto; margin-bottom: 4px; }
+    .title-badge { background-color: #2D5A42; color: #FFFDF0; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 6px 16px; border-radius: 20px; display: inline-block; text-transform: uppercase; border: 2px solid #E6A100; }
     .info-card { background-color: #F0F6F2; border: 1px solid #B8D8C6; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
     .info-item { flex: 1 1 45%; }
     .info-label { font-size: 9px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 2px; }
-    .info-value { font-size: 11.5px; font-weight: 700; color: #5C2D5C; }
-    .section-title { font-size: 10.5px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .info-value { font-size: 11px; font-weight: 700; color: #5C2D5C; }
+    .section-title { font-size: 10px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
     .section-title::before { content: ''; display: inline-block; width: 5px; height: 12px; background-color: #E6A100; border-radius: 2px; }
     table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #B8D8C6; }
-    th { background: #2D5A42; color: #FFFDF0; font-size: 9.5px; font-weight: 800; text-transform: uppercase; padding: 6px 10px; text-align: left; }
-    td { padding: 5.5px 10px; font-size: 10px; border-bottom: 1px solid #E2EFE7; }
+    th { background: #2D5A42; color: #FFFDF0; font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 5px 8px; text-align: left; }
+    td { padding: 4.5px 8px; font-size: 9.5px; border-bottom: 1px solid #E2EFE7; }
     tr:last-child td { border-bottom: none; }
     tr:nth-child(even) { background-color: #F8FAF8; }
     .badge-stone { font-weight: 800; color: #5C2D5C; }
     .note-box { background-color: #FFFDF2; border-left: 5px solid #E6A100; border: 1px solid #F0E6C2; border-left-width: 5px; border-radius: 6px; padding: 8px 12px; }
-    .note-title { font-size: 9.5px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 3px; }
-    .note-text { font-size: 10px; line-height: 1.35; color: #2D2238; }
+    .note-title { font-size: 9px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 3px; }
+    .note-text { font-size: 9.5px; line-height: 1.3; color: #2D2238; }
   </style>
 </head>
 <body>
@@ -283,13 +304,17 @@ async function generateAnalysisPDF(data) {
         <div class="info-value">${data.formattedFullName}</div>
       </div>
       <div class="info-item">
+        <div class="info-label">Sipariş / Analiz Kodu</div>
+        <div class="info-value" style="color: #E6A100;">#${data.trackingCode}</div>
+      </div>
+      <div class="info-item">
         <div class="info-label">Doğum Bilgileri</div>
-        <div class="info-value">${data.birthDate || '03.08.1975'} ${data.birthTime ? '- ' + data.birthTime : ''} ${data.birthPlace ? '(' + data.birthPlace + ')' : ''}</div>
+        <div class="info-value">${data.birthDate || ''} ${data.birthTime ? '- ' + data.birthTime : ''} ${data.birthPlace ? '(' + data.birthPlace + ')' : ''}</div>
       </div>
       ${data.intent ? `
-      <div class="info-item" style="flex: 1 1 100%; margin-top: 2px;">
+      <div class="info-item">
         <div class="info-label">Özel Niyet Desteği</div>
-        <div class="info-value" style="color: #E6A100;">${data.intent}</div>
+        <div class="info-value" style="color: #2D5A42;">${data.intent}</div>
       </div>` : ''}
     </div>
 
@@ -311,7 +336,7 @@ async function generateAnalysisPDF(data) {
       </tbody>
     </table>
 
-    <div class="section-title">Analize Özel Eşleşen Doğal Taş Koleksiyonu</div>
+    <div class="section-title">Analize Özel Eşleşen Doğal Taş Koleksiyonu (7 Taş)</div>
     <table>
       <thead>
         <tr>
@@ -336,7 +361,7 @@ async function generateAnalysisPDF(data) {
     <div class="note-box">
       <div class="note-title">Atölye Tasarım Notu</div>
       <div class="note-text">
-        Bu özel tasarım, haritanızdaki <strong>${data.analysis.sunSign}</strong> burcu${data.analysis.risingSign ? ` ve <strong>${data.analysis.risingSign}</strong> yükselen` : ''} enerjisi ile <strong>${data.analysis.lifePath}</strong> Yaşam Yolu sayınızın${data.intent ? ` hem de "<strong>${data.intent}</strong>" niyetinizin` : ''} frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur getirmesini dileriz.
+        Bu özel tasarım, haritanızdaki <strong>${data.analysis.sunSign}</strong> burcu, <strong>${data.analysis.risingSign}</strong> yükselen enerjisi ve <strong>${data.analysis.lifePath}</strong> Yaşam Yolu sayınızın${data.intent ? ` hem de "<strong>${data.intent}</strong>" niyetinizin` : ''} frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur getirmesini dileriz.
       </div>
     </div>
   </div>
@@ -360,7 +385,7 @@ async function generateAnalysisPDF(data) {
     path: filePath,
     format: 'A4',
     printBackground: true,
-    margin: { top: '8mm', bottom: '8mm', left: '8mm', right: '8mm' }
+    margin: { top: '6mm', bottom: '6mm', left: '6mm', right: '6mm' }
   });
 
   await browser.close();
@@ -374,7 +399,6 @@ app.post('/api/v1/calculate', async (req, res) => {
     const generatedCode = trackingCode || Math.floor(100000 + Math.random() * 900000).toString();
     const nameData = processNameInputs(reqFirstName, reqLastName, reqFullName);
 
-    // Tam Dinamik Hesaplama (Güneş + Yükselen Burç Dahil)
     const dynamicAnalysis = generateFullAnalysis(nameData.fullName, birthDate, birthTime, intent);
 
     const reportData = {
