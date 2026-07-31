@@ -452,7 +452,6 @@
             const hourVal = document.getElementById('birthHour').value;
             const minuteVal = document.getElementById('birthMinute').value;
 
-            // Saat ve Dakika seçimi düzgünce temizlenip standart HH:MM formatına getiriliyor
             let formattedTime = '';
             if (hourVal !== '' && minuteVal !== '') {
                 const cleanHour = hourVal.replace(':00', '').padStart(2, '0');
@@ -503,7 +502,7 @@
                         analysis.matchedStones.forEach(stone => {
                             const stoneName = typeof stone === 'string' ? stone : (stone.name || stone.stoneName || 'Bilinmeyen Taş');
                             const stoneColor = stone.color ? ` (${stone.color})` : '';
-                            const stoneSource = stone.source || stone.reason || stone.matchedFrom || ''; // Hangi sayıdan/niyetten geldiği
+                            const stoneSource = stone.source || stone.reason || stone.matchedFrom || '';
                             const style = getStoneStyle(stoneName);
                             
                             const stoneCard = document.createElement('div');
@@ -530,8 +529,10 @@
 
                     let summaryText = `Güneş Burcu: ${analysis.sunSign || 'Belirtilmedi'}\n`;
                     
-                    if (analysis.ascendant && analysis.ascendant !== 'Bilinmiyor') {
-                        summaryText += `Yükselen Burç: ${analysis.ascendant}\n`;
+                    // Yükselen Burç Değişkeni Düzeltildi (risingSign kontrolü yapılıyor)
+                    const risingSignVal = analysis.risingSign || analysis.ascendant;
+                    if (risingSignVal && risingSignVal !== 'Bilinmiyor') {
+                        summaryText += `Yükselen Burç: ${risingSignVal}\n`;
                     } else {
                         summaryText += `Yükselen Burç: Bilinmiyor (Sağlıklı hesaplama için doğum saati ve yeri girilmelidir)\n`;
                     }

@@ -50,6 +50,16 @@ function trToEn(text) {
     .replace(/ç/g, 'c').replace(/Ç/g, 'C');
 }
 
+function parseTurkishDate(dateStr) {
+  if (!dateStr) return new Date();
+  if (dateStr.includes('-')) return new Date(dateStr);
+  const parts = dateStr.split('.');
+  if (parts.length === 3) {
+    return new Date(parts[2], parts[1] - 1, parts[0]);
+  }
+  return new Date();
+}
+
 function reduceNumber(num, keepMaster = true) {
   while (num > 9) {
     if (keepMaster && (num === 11 || num === 22 || num === 33)) break;
@@ -60,7 +70,7 @@ function reduceNumber(num, keepMaster = true) {
 
 function calculateSunSign(birthDateStr) {
   if (!birthDateStr) return 'Yengeç';
-  const date = new Date(birthDateStr);
+  const date = parseTurkishDate(birthDateStr);
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
@@ -204,6 +214,7 @@ function generateFullAnalysis(fullName, birthDate, birthTime, intent) {
     lifePathDesc: NUMBER_DESCRIPTIONS[lifePath] || NUMBER_DESCRIPTIONS[2],
     sunSign,
     risingSign,
+    intent: intent || 'Bolluk & Bereket',
     matchedStones
   };
 }
