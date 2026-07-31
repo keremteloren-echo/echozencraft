@@ -103,6 +103,29 @@ function calculateSunSign(birthDateStr) {
   return 'Aslan';
 }
 
+// DİNAMİK YÜKSELEN BURÇ HESAPLAMA (Yerel Saat Yaklaşımı)
+function calculateRisingSign(birthDateStr, birthTimeStr) {
+  if (!birthTimeStr) return 'Belirtilmedi';
+
+  const signs = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
+  
+  const [hours, minutes] = birthTimeStr.split(':').map(Number);
+  const timeInHours = hours + (minutes || 0) / 60;
+
+  const sunSign = calculateSunSign(birthDateStr);
+  const sunIndex = signs.indexOf(sunSign);
+
+  // Güneş yaklaşık 06:00'da doğar ve Güneş burcu ufukta yükselir.
+  // Her 2 saatte bir yükselen burç 1 burç ilerler (30 derece).
+  let hoursSinceSunrise = timeInHours - 6;
+  if (hoursSinceSunrise < 0) hoursSinceSunrise += 24;
+
+  const signOffset = Math.floor(hoursSinceSunrise / 2);
+  const risingIndex = (sunIndex + signOffset) % 12;
+
+  return signs[risingIndex];
+}
+
 // Yaşam Yolu Sayısı Hesaplama
 function calculateLifePath(birthDateStr) {
   if (!birthDateStr) return 11;
@@ -111,7 +134,7 @@ function calculateLifePath(birthDateStr) {
   return reduceNumber(sum);
 }
 
-// Isim Numerolojisi Hesaplama (Pythagorean)
+// Isim Numerolojisi Hesaplama
 function calculateNameNumerology(fullName) {
   const charValues = {
     a:1, j:1, s:1, ş:1, b:2, k:2, t:2, c:3, ç:3, l:3, u:3, ü:3,
@@ -160,8 +183,9 @@ const BURC_TASLARI = {
 };
 
 // Tam Dinamik Analiz Üretici
-function generateFullAnalysis(fullName, birthDate, intent) {
+function generateFullAnalysis(fullName, birthDate, birthTime, intent) {
   const sunSign = calculateSunSign(birthDate);
+  const risingSign = calculateRisingSign(birthDate, birthTime);
   const lifePath = calculateLifePath(birthDate);
   const { destiny, soulUrge, personality } = calculateNameNumerology(fullName);
 
@@ -180,7 +204,7 @@ function generateFullAnalysis(fullName, birthDate, intent) {
     personality,
     lifePath,
     sunSign,
-    risingSign: 'Aslan',
+    risingSign,
     matchedStones
   };
 }
@@ -283,7 +307,7 @@ async function generateAnalysisPDF(data) {
         <tr><td><strong>Kişilik Sayısı (${data.analysis.personality})</strong></td><td>Dinamik, çekici, değişime açık ve meraklı bir profil.</td></tr>
         <tr><td><strong>Yaşam Yolu (${data.analysis.lifePath})</strong></td><td>Ruhsal uyanış ve kitlelere rehberlik etme yolu.</td></tr>
         <tr><td><strong>Güneş Burcu</strong></td><td>${data.analysis.sunSign}</td></tr>
-        <tr><td><strong>Yükselen Burç</strong></td><td>${data.analysis.risingSign || 'Belirtilmedi'}</td></tr>
+        <tr><td><strong>Yükselen Burç</strong></td><td>${data.analysis.risingSign}</td></tr>
       </tbody>
     </table>
 
@@ -312,7 +336,7 @@ async function generateAnalysisPDF(data) {
     <div class="note-box">
       <div class="note-title">Atölye Tasarım Notu</div>
       <div class="note-text">
-        Bu özel tasarım, haritanızdaki <strong>${data.analysis.sunSign}</strong> burcu ve <strong>${data.analysis.lifePath}</strong> Yaşam Yolu sayınızın${data.intent ? ` hem de "<strong>${data.intent}</strong>" niyetinizin` : ''} frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur getirmesini dileriz.
+        Bu özel tasarım, haritanızdaki <strong>${data.analysis.sunSign}</strong> burcu${data.analysis.risingSign ? ` ve <strong>${data.analysis.risingSign}</strong> yükselen` : ''} enerjisi ile <strong>${data.analysis.lifePath}</strong> Yaşam Yolu sayınızın${data.intent ? ` hem de "<strong>${data.intent}</strong>" niyetinizin` : ''} frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur getirmesini dileriz.
       </div>
     </div>
   </div>
@@ -350,8 +374,8 @@ app.post('/api/v1/calculate', async (req, res) => {
     const generatedCode = trackingCode || Math.floor(100000 + Math.random() * 900000).toString();
     const nameData = processNameInputs(reqFirstName, reqLastName, reqFullName);
 
-    // Tam Dinamik Hesaplama
-    const dynamicAnalysis = generateFullAnalysis(nameData.fullName, birthDate, intent);
+    // Tam Dinamik Hesaplama (Güneş + Yükselen Burç Dahil)
+    const dynamicAnalysis = generateFullAnalysis(nameData.fullName, birthDate, birthTime, intent);
 
     const reportData = {
       fullName: nameData.fullName,
