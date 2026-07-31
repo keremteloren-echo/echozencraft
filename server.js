@@ -244,7 +244,7 @@ async function generateAnalysisPDF(data) {
         </tr>
       </thead>
       <tbody>
-        ${(data.analysis.matchedStones || []).map(s => `
+         ${(data.analysis.matchedStones || []).map(s => `
           <tr>
             <td class="badge-stone">${s.name}</td>
             <td>${s.reason}</td>
@@ -267,7 +267,14 @@ async function generateAnalysisPDF(data) {
 
   const browser = await puppeteer.launch({
     headless: 'new',
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+    executablePath: puppeteer.executablePath(),
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--single-process',
+      '--no-zygote'
+    ]
   });
   const page = await browser.newPage();
 
