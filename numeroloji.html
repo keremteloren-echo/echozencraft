@@ -440,9 +440,9 @@
         populateSelect('birthHour', 0, 23, 1, 2, ':00');
         populateSelect('birthMinute', 0, 59, 5);
 
-        // Render sunucusunu uyanık tutmak için 14 dakikada bir ping atıyoruz
+        // Canlı sunucuyu uyanık tutmak için 14 dakikada bir ping atıyoruz
         setInterval(() => {
-            fetch('http://localhost:3000/api/keep-alive').catch(() => {});
+            fetch('/api/keep-alive').catch(() => {});
         }, 14 * 60 * 1000);
 
         document.getElementById('analysisForm').addEventListener('submit', async (e) => {
@@ -485,7 +485,7 @@
                 intent: intentSelect.value
             };
 
-            const apiUrl = 'http://localhost:3000/api/v1/calculate';
+            const apiUrl = '/api/v1/calculate';
 
             try {
                 const response = await fetch(apiUrl, {
