@@ -642,6 +642,138 @@
           }
         ]
       }
+    },
+    {
+      "id": "1785566515353",
+      "code": "248862",
+      "createdAt": "2026-08-01T06:41:55.353Z",
+      "status": "PENDING",
+      "user": {
+        "firstName": "Burcu",
+        "lastName": "Çuvalcı Özkan",
+        "fullName": "Burcu Çuvalcı Özkan",
+        "email": "xxx@k",
+        "birthDate": "1988-08-21",
+        "birthTime": "21:50",
+        "birthPlace": "istanbul"
+      },
+      "intent": "huzur",
+      "analysis": {
+        "destiny": 5,
+        "destinyDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "soulUrge": 8,
+        "soulUrgeDesc": "Başarı, güç, prestij, finansal bağımsızlık ve yetkinlik arayışını simgeler.",
+        "personality": 6,
+        "personalityDesc": "Sorumluluk, sevgi, fedakarlık ve aile odaklılık.",
+        "lifePath": 1,
+        "lifePathDesc": "Liderlik, bağımsızlık, özgünlük ve cesaret yoludur.",
+        "sunSign": "Aslan",
+        "risingSign": "Balık",
+        "matchedStones": [
+          {
+            "name": "FİRUZE",
+            "reason": "Kader Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "HEMATİT",
+            "reason": "Ruh Güdüsü Sayısı (8)",
+            "color": "Metalik Gri",
+            "element": "Ateş"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Kişilik Sayısı (6)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (1) & Güneş Burcu (Aslan)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Yükselen Burç (Balık)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (huzur)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785566741755",
+      "code": "818124",
+      "createdAt": "2026-08-01T06:45:41.755Z",
+      "status": "PENDING",
+      "user": {
+        "firstName": "burcu",
+        "lastName": "çuvalcı özkan",
+        "fullName": "burcu çuvalcı özkan",
+        "email": "xx@yy",
+        "birthDate": "1988-08-21",
+        "birthTime": "21:50",
+        "birthPlace": "İstanbul"
+      },
+      "intent": "mutluluk",
+      "analysis": {
+        "destiny": 5,
+        "destinyDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "soulUrge": 8,
+        "soulUrgeDesc": "Başarı, güç, prestij, finansal bağımsızlık ve yetkinlik arayışı.",
+        "personality": 6,
+        "personalityDesc": "Sorumluluk, sevgi, fedakarlık ve aile odaklılık.",
+        "lifePath": 1,
+        "lifePathDesc": "Liderlik, bağımsızlık, özgünlük ve cesaret yoludur.",
+        "sunSign": "Aslan",
+        "risingSign": "Balık",
+        "matchedStones": [
+          {
+            "name": "FİRUZE",
+            "reason": "Kader Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "HEMATİT",
+            "reason": "Ruh Güdüsü Sayısı (8)",
+            "color": "Metalik Gri",
+            "element": "Ateş"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Kişilik Sayısı (6)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (1) & Güneş Burcu (Aslan)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Yükselen Burç (Balık)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (mutluluk)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
     }
   ]
 }

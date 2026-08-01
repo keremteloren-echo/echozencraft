@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
-const puppeteer = require('puppeteer');
 const fs = require('fs');
+const PDFDocument = require('pdfkit');
 const { google } = require('googleapis');
 const nodemailer = require('nodemailer');
 require('dotenv').config();
@@ -48,7 +48,6 @@ if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir, { recursive: true });
 app.use('/pdfs', express.static(pdfDir));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'numeroloji.html')));
-
 app.get('/api/keep-alive', (req, res) => res.status(200).send('Alive'));
 
 function trToEn(text) {
@@ -91,18 +90,15 @@ function calculateSunSign(birthDateStr) {
 }
 
 function calculateRisingSign(birthDateStr, hour, minute, birthPlace) {
-  if (!hour || !minute || !birthPlace) return 'Belirtilmedi (Saat veya Yer Eksik)';
-  
+  if (!hour || !minute || !birthPlace) return 'Belirtilmedi';
   const birthTimeStr = `${hour}:${minute}`;
   const signs = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
   const [hours, minutes] = birthTimeStr.split(':').map(Number);
   const timeInHours = hours + (minutes || 0) / 60;
   const sunSign = calculateSunSign(birthDateStr);
   const sunIndex = signs.indexOf(sunSign);
-
   let hoursSinceSunrise = timeInHours - 6;
   if (hoursSinceSunrise < 0) hoursSinceSunrise += 24;
-
   const signOffset = Math.floor(hoursSinceSunrise / 2);
   return signs[(sunIndex + signOffset) % 12];
 }
@@ -123,7 +119,6 @@ function calculateNameNumerology(fullName) {
   const cleanName = (fullName || '').toLowerCase().replace(/[^a-zçğıöşü]/g, '');
 
   let soulUrgeSum = 0, personalitySum = 0, destinySum = 0;
-
   for (let char of cleanName) {
     const val = charValues[char] || 0;
     destinySum += val;
@@ -146,9 +141,9 @@ const NUMBER_DESCRIPTIONS = {
   5: "Dinamik, çekici, değişime açık ve meraklı bir profil.",
   6: "Sorumluluk, sevgi, fedakarlık ve aile odaklılık.",
   7: "Özgürce deneyimleme, analiz ve keşfetme arzusu.",
-  8: "Başarı, güç, prestij, finansal bağımsızlık ve yetkinlik arayışını simgeler.",
+  8: "Başarı, güç, prestij, finansal bağımsızlık ve yetkinlik arayışı.",
   9: "Evrensel sevgi, merhamet ve insanlığa hizmet.",
-  11: "Yüksek sezgi, ilham, ruhsal rehberlik ve aydınlanmayı simgeler (Üstat Sezgi).",
+  11: "Yüksek sezgi, ilham, ruhsal rehberlik ve aydınlanma.",
   22: "Büyük projeleri hayata geçirme ve evrensel inşa gücü.",
   33: "Ruhsal uyanış ve kitlelere rehberlik etme yolu."
 };
@@ -195,8 +190,7 @@ function generateFullAnalysis(fullName, birthDateStr, hour, minute, birthPlace, 
   const destStone = getNumStone(destiny);
   const soulStone = getNumStone(soulUrge);
   const persStone = getNumStone(personality);
-  
-  const risingStone = risingSign.includes('Eksik') ? { name: 'BEYAZ KUVARS', color: 'Şeffaf Beyaz', element: 'Tümü' } : getZodiacStone(risingSign);
+  const risingStone = risingSign.includes('Belirtilmedi') ? { name: 'BEYAZ KUVARS', color: 'Şeffaf Beyaz', element: 'Tümü' } : getZodiacStone(risingSign);
 
   const matchedStones = [
     { name: destStone.name, reason: `Kader Sayısı (${destiny})`, color: destStone.color, element: destStone.element },
@@ -208,17 +202,11 @@ function generateFullAnalysis(fullName, birthDateStr, hour, minute, birthPlace, 
   ];
 
   return {
-    destiny,
-    destinyDesc: NUMBER_DESCRIPTIONS[destiny] || NUMBER_DESCRIPTIONS[11],
-    soulUrge,
-    soulUrgeDesc: NUMBER_DESCRIPTIONS[soulUrge] || NUMBER_DESCRIPTIONS[3],
-    personality,
-    personalityDesc: NUMBER_DESCRIPTIONS[personality] || NUMBER_DESCRIPTIONS[8],
-    lifePath,
-    lifePathDesc: NUMBER_DESCRIPTIONS[lifePath] || NUMBER_DESCRIPTIONS[2],
-    sunSign,
-    risingSign,
-    matchedStones
+    destiny, destinyDesc: NUMBER_DESCRIPTIONS[destiny] || NUMBER_DESCRIPTIONS[11],
+    soulUrge, soulUrgeDesc: NUMBER_DESCRIPTIONS[soulUrge] || NUMBER_DESCRIPTIONS[3],
+    personality, personalityDesc: NUMBER_DESCRIPTIONS[personality] || NUMBER_DESCRIPTIONS[8],
+    lifePath, lifePathDesc: NUMBER_DESCRIPTIONS[lifePath] || NUMBER_DESCRIPTIONS[2],
+    sunSign, risingSign, matchedStones
   };
 }
 
@@ -230,173 +218,99 @@ function processNameInputs(firstName, lastName) {
   return { firstName: fName, lastName: lName, fullName, formattedFullName };
 }
 
-function getLogoBase64() {
-  const possibleLogos = [
-    path.join(__dirname, 'assets', 'logo.jpeg'),
-    path.join(__dirname, 'assets', 'logo.jpg'),
-    path.join(__dirname, 'assets', 'logo.png'),
-    'logo.jpeg', 'logo.jpg', 'logo.png'
-  ];
-  for (const logoPath of possibleLogos) {
-    if (fs.existsSync(logoPath)) {
-      const ext = path.extname(logoPath).replace('.', '');
-      const mime = ext === 'jpg' ? 'jpeg' : ext;
-      return `data:image/${mime};base64,${fs.readFileSync(logoPath).toString('base64')}`;
+// PDFKit ile doğrudan güvenli PDF üretimi
+function generateAnalysisPDF(data) {
+  return new Promise((resolve, reject) => {
+    try {
+      const safeName = trToEn(data.fullName).replace(/[^a-zA-Z0-9]/g, '_');
+      const fileName = `Rapor_${safeName}_${data.trackingCode}.pdf`;
+      const filePath = path.join(pdfDir, fileName);
+
+      const doc = new PDFDocument({ size: 'A4', margin: 40 });
+      const stream = fs.createWriteStream(filePath);
+      doc.pipe(stream);
+
+      // Renk Paleti
+      const primaryColor = '#2D5A42';
+      const accentColor = '#E6A100';
+      const textColor = '#1E2D24';
+
+      // Başlık Rozeti
+      doc.rect(40, 40, 515, 30).fill(primaryColor);
+      doc.fillColor('#FFFDF0').fontSize(11).font('Helvetica-Bold').text('KISISEL NUMEROLOJI VE ANALIZ RAPORU', 40, 48, { align: 'center', width: 515 });
+      doc.moveDown(2);
+
+      // Bilgi Kartı
+      doc.fillColor(textColor).fontSize(10);
+      doc.font('Helvetica-Bold').text('MUSTERI: ', { continued: true }).font('Helvetica').text(data.formattedFullName);
+      doc.font('Helvetica-Bold').text('SIPARIS KODU: ', { continued: true }).font('Helvetica').text(`#${data.trackingCode}`);
+      doc.font('Helvetica-Bold').text('DOGUM BILGILERI: ', { continued: true }).font('Helvetica').text(`${data.birthDate || ''} ${data.hour ? data.hour + ':' + data.minute : ''} (${data.birthPlace || 'Belirtilmedi'})`);
+      if (data.intent) {
+        doc.font('Helvetica-Bold').text('OZEL NIYET: ', { continued: true }).font('Helvetica').text(data.intent);
+      }
+      doc.moveDown(1.5);
+
+      // Bölüm 1: Numerolojik ve Astrolojik Harita
+      doc.fillColor(primaryColor).fontSize(12).font('Helvetica-Bold').text('NUMEROLOJIK VE ASTROLOJIK HARITA');
+      doc.moveDown(0.5);
+
+      const metrics = [
+        ['Kader Sayisi', `${data.analysis.destiny} - ${data.analysis.destinyDesc}`],
+        ['Ruh Gudusu', `${data.analysis.soulUrge} - ${data.analysis.soulUrgeDesc}`],
+        ['Kisilik Sayisi', `${data.analysis.personality} - ${data.analysis.personalityDesc}`],
+        ['Yasam Yolu', `${data.analysis.lifePath} - ${data.analysis.lifePathDesc}`],
+        ['Gunes Burcu', data.analysis.sunSign],
+        ['Yukselen Burc', data.analysis.risingSign]
+      ];
+
+      metrics.forEach(([label, desc]) => {
+        doc.fontSize(9).font('Helvetica-Bold').fillColor(primaryColor).text(label, { continued: true, width: 120 });
+        doc.font('Helvetica').fillColor(textColor).text(`: ${desc}`);
+        doc.moveDown(0.3);
+      });
+
+      doc.moveDown(1);
+
+      // Bölüm 2: Doğal Taş Koleksiyonu
+      doc.fillColor(primaryColor).fontSize(12).font('Helvetica-Bold').text('ESLESEN DOGAL TAS KOLEKSIYONU');
+      doc.moveDown(0.5);
+
+      (data.analysis.matchedStones || []).forEach(stone => {
+        doc.fontSize(9).font('Helvetica-Bold').fillColor('#5C2D5C').text(stone.name, { continued: true, width: 120 });
+        doc.font('Helvetica').fillColor(textColor).text(`: ${stone.reason} (${stone.color}, ${stone.element})`);
+        doc.moveDown(0.3);
+      });
+
+      doc.moveDown(1.5);
+
+      // Atölye Tasarım Notu
+      doc.rect(40, doc.y, 515, 50).fillAndStroke('#FFFDF2', accentColor);
+      doc.fillColor(primaryColor).fontSize(9).font('Helvetica-Bold').text('ATOLYE TASARIM NOTU', 50, doc.y - 40);
+      doc.fillColor('#2D2238').font('Helvetica').fontSize(8.5).text(
+        `Bu ozel tasarım, haritanızdaki ${data.analysis.sunSign} burcu ve ${data.analysis.lifePath} Yaşam Yolu sayınız ile "${data.intent || 'bolluk'}" niyetinizin frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır.`,
+        50, doc.y - 25, { width: 495 }
+      );
+
+      doc.end();
+
+      stream.on('finish', () => resolve({ filePath, fileName }));
+      stream.on('error', (err) => reject(err));
+    } catch (e) {
+      reject(e);
     }
-  }
-  return '';
-}
-
-async function generateAnalysisPDF(data) {
-  const logoBase64 = getLogoBase64();
-  const displayTime = data.hour && data.minute ? `${data.hour}:${data.minute}` : '';
-
-  const htmlContent = `<!DOCTYPE html>
-<html lang="tr">
-<head>
-  <meta charset="UTF-8">
-  <style>
-    @page { size: A4; margin: 0; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, Arial, sans-serif; background-color: #F4F7F4; color: #1E2D24; padding: 12px; }
-    .container { max-width: 780px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; padding: 18px 24px; border: 1.5px solid #2D5A42; }
-    .header { text-align: center; margin-bottom: 10px; }
-    .logo { max-width: 160px; height: auto; margin-bottom: 6px; }
-    .title-badge { background-color: #2D5A42; color: #FFFDF0; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 6px 16px; border-radius: 20px; display: inline-block; text-transform: uppercase; border: 2px solid #E6A100; }
-    .info-card { background-color: #F0F6F2; border: 1px solid #B8D8C6; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
-    .info-item { flex: 1 1 45%; }
-    .info-label { font-size: 9px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 2px; }
-    .info-value { font-size: 11px; font-weight: 700; color: #5C2D5C; }
-    .section-title { font-size: 10px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-    .section-title::before { content: ''; display: inline-block; width: 5px; height: 12px; background-color: #E6A100; border-radius: 2px; }
-    table { width: 100%; border-collapse: separate; border-spacing: 0; margin-bottom: 10px; border-radius: 8px; overflow: hidden; border: 1px solid #B8D8C6; }
-    th { background: #2D5A42; color: #FFFDF0; font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 5px 8px; text-align: left; }
-    td { padding: 4.5px 8px; font-size: 9.5px; border-bottom: 1px solid #E2EFE7; }
-    tr:last-child td { border-bottom: none; }
-    tr:nth-child(even) { background-color: #F8FAF8; }
-    .badge-stone { font-weight: 800; color: #5C2D5C; }
-    .note-box { background-color: #FFFDF2; border-left: 5px solid #E6A100; border: 1px solid #F0E6C2; border-radius: 6px; padding: 8px 12px; }
-    .note-title { font-size: 9px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 3px; }
-    .note-text { font-size: 9.5px; line-height: 1.3; color: #2D2238; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      ${logoBase64 ? `<img src="${logoBase64}" class="logo" alt="Logo"><br>` : ''}
-      <div class="title-badge">KİŞİSEL NUMEROLOJİ VE ANALİZ RAPORU</div>
-    </div>
-
-    <div class="info-card">
-      <div class="info-item">
-        <div class="info-label">MÜŞTERİ ADI SOYADI</div>
-        <div class="info-value">${data.formattedFullName}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">SİPARİŞ / ANALİZ KODU</div>
-        <div class="info-value" style="color: #E6A100;">#${data.trackingCode}</div>
-      </div>
-      <div class="info-item">
-        <div class="info-label">DOĞUM BİLGİLERİ</div>
-        <div class="info-value">${data.birthDate || ''} ${displayTime ? '- ' + displayTime : ''} ${data.birthPlace ? '(' + data.birthPlace + ')' : ''}</div>
-      </div>
-      ${data.intent ? `
-      <div class="info-item">
-        <div class="info-label">ÖZEL NİYET DESTEĞİ</div>
-        <div class="info-value" style="color: #2D5A42;">${data.intent}</div>
-      </div>` : ''}
-    </div>
-
-    <div class="section-title">NUMEROLOJİK VE ASTROLOJİK HARİTA</div>
-    <table>
-      <thead>
-        <tr>
-          <th style="width: 30%;">METRİK</th>
-          <th style="width: 70%;">AÇIKLAMA / ANALİZ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>Kader Sayısı (${data.analysis.destiny})</td><td>${data.analysis.destinyDesc}</td></tr>
-        <tr><td>Ruh Güdüsü (${data.analysis.soulUrge})</td><td>${data.analysis.soulUrgeDesc}</td></tr>
-        <tr><td>Kişilik Sayısı (${data.analysis.personality})</td><td>${data.analysis.personalityDesc}</td></tr>
-        <tr><td>Yaşam Yolu (${data.analysis.lifePath})</td><td>${data.analysis.lifePathDesc}</td></tr>
-        <tr><td>Güneş Burcu</td><td>${data.analysis.sunSign}</td></tr>
-        <tr><td>Yükselen Burç</td><td>${data.analysis.risingSign}</td></tr>
-      </tbody>
-    </table>
-
-    <div class="section-title">ANALİZE ÖZEL EŞLEŞEN DOĞAL TAŞ KOLEKSİYONU</div>
-    <table>
-      <thead>
-        <tr>
-          <th style="width: 25%;">TAŞ İSMİ</th>
-          <th style="width: 45%;">EŞLEŞME NEDENİ / FREKANSI</th>
-          <th style="width: 15%;">RENK</th>
-          <th style="width: 15%;">ELEMENT</th>
-        </tr>
-      </thead>
-      <tbody>
-         ${(data.analysis.matchedStones || []).map(s => `
-          <tr>
-            <td class="badge-stone">${s.name}</td>
-            <td>${s.reason}</td>
-            <td>${s.color}</td>
-            <td>${s.element}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-
-    <div class="note-box">
-      <div class="note-title">Atölye Tasarım Notu</div>
-      <div class="note-text">
-        Bu özel tasarım, haritanızdaki ${data.analysis.sunSign} burcu ve ${data.analysis.risingSign.split(' ')[0]} yükselen enerjisi ile ${data.analysis.lifePath} Yaşam Yolu sayınızın hem de "${data.intent || 'bolluk'}" niyetinizin frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur ve denge getirmesini dileriz.
-      </div>
-    </div>
-  </div>
-</body>
-</html>`;
-
-  const browser = await puppeteer.launch({
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
   });
-  const page = await browser.newPage();
-  await page.setContent(htmlContent, { waitUntil: 'networkidle0' });
-
-  const safeName = trToEn(data.fullName).replace(/[^a-zA-Z0-9]/g, '_');
-  const fileName = `Rapor_${safeName}_${data.trackingCode}.pdf`;
-  const filePath = path.join(pdfDir, fileName);
-
-  await page.pdf({
-    path: filePath,
-    format: 'A4',
-    printBackground: true,
-    margin: { top: '6mm', bottom: '6mm', left: '6mm', right: '6mm' }
-  });
-
-  await browser.close();
-  return { filePath, fileName };
 }
 
 app.post('/api/v1/calculate', async (req, res) => {
   try {
     const { firstName, lastName, email, day, month, year, hour, minute, birthPlace, intent, trackingCode } = req.body;
     
-    console.log('\n--- YENİ FORM GİRİŞİ (RENDER LOG) ---');
+    console.log('\n--- YENİ FORM GİRİŞİ (PDFKIT) ---');
     console.log(`Ad Soyad: ${firstName || ''} ${lastName || ''}`);
-    console.log(`E-posta: ${email || 'Belirtilmedi'}`);
-    console.log(`Doğum Tarihi: ${day || ''}/${month || ''}/${year || ''}`);
-    console.log(`Doğum Saati: ${hour || ''}:${minute || ''}`);
-    console.log(`Doğum Yeri: ${birthPlace || ''}`);
-    console.log(`Niyet: ${intent || ''}`);
-    console.log('-------------------------------------\n');
 
     const birthDate = (year && month && day) ? `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}` : '';
-    
     const generatedCode = trackingCode || Math.floor(100000 + Math.random() * 900000).toString();
     const nameData = processNameInputs(firstName, lastName);
-    
     const dynamicAnalysis = generateFullAnalysis(nameData.fullName, birthDate, hour, minute, birthPlace, intent);
 
     const reportData = {
@@ -404,11 +318,7 @@ app.post('/api/v1/calculate', async (req, res) => {
       firstName: nameData.firstName,
       lastName: nameData.lastName,
       formattedFullName: nameData.formattedFullName,
-      birthDate,
-      hour,
-      minute,
-      birthPlace,
-      intent,
+      birthDate, hour, minute, birthPlace, intent,
       trackingCode: generatedCode,
       analysis: dynamicAnalysis
     };
@@ -416,69 +326,39 @@ app.post('/api/v1/calculate', async (req, res) => {
     try {
         const dbPath = path.join(__dirname, 'database.json');
         let db = { records: [] };
-
         if (fs.existsSync(dbPath)) {
-            const rawData = fs.readFileSync(dbPath);
-            db = JSON.parse(rawData);
+            db = JSON.parse(fs.readFileSync(dbPath));
         }
-
-        const newRecord = {
+        db.records.push({
             id: Date.now().toString(),
             code: generatedCode,
             createdAt: new Date().toISOString(),
             status: "PENDING",
-            user: {
-                firstName: nameData.firstName,
-                lastName: nameData.lastName,
-                fullName: nameData.fullName,
-                email: email,
-                birthDate: birthDate,
-                birthTime: `${hour}:${minute}`,
-                birthPlace: birthPlace
-            },
-            intent: intent,
-            analysis: dynamicAnalysis
-        };
-
-        db.records.push(newRecord);
+            user: { firstName: nameData.firstName, lastName: nameData.lastName, fullName: nameData.fullName, email, birthDate, birthTime: `${hour}:${minute}`, birthPlace },
+            intent, analysis: dynamicAnalysis
+        });
         fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
-        console.log("Yedekleme başarılı: Ad, soyad ve tüm veriler database.json dosyasına yazıldı.");
-    } catch (backupError) {
-        console.error("Yedekleme sırasında hata:", backupError);
-    }
+    } catch (bErr) { console.error("DB Hata:", bErr); }
 
     (async () => {
       try {
         const { filePath, fileName } = await generateAnalysisPDF(reportData);
-        console.log(`PDF kaydedildi: pdfs/${fileName}`);
-        
         let driveUrl = "Drive Hatası";
         try {
             const fileId = await uploadToDrive(filePath, fileName);
-            console.log(`Drive Yüklendi. ID: ${fileId}`);
             driveUrl = `Dosya ID: ${fileId}`;
-        } catch(dErr) {
-             console.error("Drive yüklemesi başarısız oldu:", dErr.message);
-        }
+        } catch(dErr) { console.error("Drive Hata:", dErr.message); }
 
-        const mailOptions = {
+        await transporter.sendMail({
           from: `"Echo Zen Craft Sistem" <${process.env.EMAIL_USER}>`,
           to: process.env.EMAIL_USER,
           subject: `Yeni Sipariş PDF Raporu: ${nameData.formattedFullName} - #${generatedCode}`,
-          text: `Merhaba,\n\n${nameData.formattedFullName} isimli müşteri için hazırlanan analiz raporu PDF formatında ektedir.\n\nMüşteri Adı Soyadı: ${nameData.fullName}\nMüşteri E-posta: ${email || 'Belirtilmedi'}\nDrive Durumu: ${driveUrl}\n\nBu rapor çıktı alınıp hazırlanan tasarımla birlikte gönderime hazırdır.\n\nKolay gelsin,\nEcho Zen Craft Otomasyonu`,
-          attachments: [
-            {
-              filename: fileName,
-              path: filePath
-            }
-          ]
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log(`E-posta başarıyla sana gönderildi.`);
-
-      } catch (processError) {
-        console.error('PDF veya E-posta işlemi sırasında genel hata:', processError.message);
+          text: `Merhaba,\n\n${nameData.formattedFullName} için hazırlanan analiz raporu ekte yer almaktadır.\nDrive Durumu: ${driveUrl}\n\nKolay gelsin,\nEcho Zen Craft`,
+          attachments: [{ filename: fileName, path: filePath }]
+        });
+        console.log(`PDF başarıyla oluşturuldu, mail atıldı ve Drive'a yüklendi!`);
+      } catch (pErr) {
+        console.error('PDF/Mail işlem hatası:', pErr.message);
       }
     })();
 
