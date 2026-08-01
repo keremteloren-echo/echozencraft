@@ -247,7 +247,6 @@ function getLogoBase64() {
   return '';
 }
 
-// Bilgisayardaki mevcut Chrome/Edge tarayıcısını otomatik bulan fonksiyon
 function getChromeExecutablePath() {
   const paths = [
     'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
@@ -374,7 +373,7 @@ async function generateAnalysisPDF(data) {
 
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: getChromeExecutablePath(),
+    executablePath: process.env.RENDER ? undefined : getChromeExecutablePath(),
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
   });
   const page = await browser.newPage();
