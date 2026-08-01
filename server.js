@@ -247,20 +247,6 @@ function getLogoBase64() {
   return '';
 }
 
-function getChromeExecutablePath() {
-  const paths = [
-    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Users\\' + (process.env.USERNAME || '') + '\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe',
-    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
-    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
-  ];
-  for (const p of paths) {
-    if (fs.existsSync(p)) return p;
-  }
-  return undefined;
-}
-
 async function generateAnalysisPDF(data) {
   const logoBase64 = getLogoBase64();
   const displayTime = data.hour && data.minute ? `${data.hour}:${data.minute}` : '';
@@ -373,7 +359,6 @@ async function generateAnalysisPDF(data) {
 
   const browser = await puppeteer.launch({
     headless: true,
-    executablePath: process.env.RENDER ? undefined : getChromeExecutablePath(),
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
   });
   const page = await browser.newPage();
