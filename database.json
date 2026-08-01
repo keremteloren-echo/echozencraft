@@ -906,6 +906,65 @@
           }
         ]
       }
+    },
+    {
+      "id": "1785568694497",
+      "code": "192894",
+      "createdAt": "2026-08-01T07:18:14.497Z",
+      "status": "PENDING",
+      "user": {
+        "firstName": "Öznur",
+        "lastName": "Sönmez Aksoy",
+        "fullName": "Öznur Sönmez Aksoy",
+        "email": "xx@hh",
+        "birthDate": "1988-12-28",
+        "birthTime": "19:15",
+        "birthPlace": "alanya"
+      },
+      "intent": "kariyer",
+      "analysis": {
+        "destiny": 5,
+        "destinyDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "soulUrge": 9,
+        "soulUrgeDesc": "Evrensel sevgi, merhamet ve insanlığa hizmet.",
+        "personality": 5,
+        "personalityDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "lifePath": 3,
+        "lifePathDesc": "Kendini neşeyle ifade etme ve ilham verme arzusu.",
+        "sunSign": "Oğlak",
+        "matchedStones": [
+          {
+            "name": "FİRUZE",
+            "reason": "Kader Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "LABRADORİT",
+            "reason": "Ruh Güdüsü Sayısı (9)",
+            "color": "Mavi/Gri",
+            "element": "Hava"
+          },
+          {
+            "name": "FİRUZE",
+            "reason": "Kişilik Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "HEMATİT",
+            "reason": "Yaşam Yolu (3) & Güneş Burcu (Oğlak)",
+            "color": "Metalik Gri",
+            "element": "Toprak"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (kariyer)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
     }
   ]
 }

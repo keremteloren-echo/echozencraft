@@ -91,20 +91,6 @@ function calculateSunSign(birthDateStr) {
   return 'Yengeç';
 }
 
-function calculateRisingSign(birthDateStr, hour, minute, birthPlace) {
-  if (!hour || !minute || !birthPlace) return 'Belirtilmedi (Saat veya Yer Eksik)';
-  const birthTimeStr = `${hour}:${minute}`;
-  const signs = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
-  const [hours, minutes] = birthTimeStr.split(':').map(Number);
-  const timeInHours = hours + (minutes || 0) / 60;
-  const sunSign = calculateSunSign(birthDateStr);
-  const sunIndex = signs.indexOf(sunSign);
-  let hoursSinceSunrise = timeInHours - 6;
-  if (hoursSinceSunrise < 0) hoursSinceSunrise += 24;
-  const signOffset = Math.floor(hoursSinceSunrise / 2);
-  return signs[(sunIndex + signOffset) % 12];
-}
-
 function calculateLifePath(birthDateStr) {
   if (!birthDateStr) return 2;
   const digits = birthDateStr.replace(/\D/g, '').split('').map(Number);
@@ -180,9 +166,8 @@ const ZODIAC_STONES = {
   'Balık': { name: 'PEMBE KUVARS', color: 'Pembe', element: 'Su' }
 };
 
-function generateFullAnalysis(fullName, birthDateStr, hour, minute, birthPlace, intent) {
+function generateFullAnalysis(fullName, birthDateStr, intent) {
   const sunSign = calculateSunSign(birthDateStr);
-  const risingSign = calculateRisingSign(birthDateStr, hour, minute, birthPlace);
   const lifePath = calculateLifePath(birthDateStr);
   const { destiny, soulUrge, personality } = calculateNameNumerology(fullName);
 
@@ -192,14 +177,13 @@ function generateFullAnalysis(fullName, birthDateStr, hour, minute, birthPlace, 
   const destStone = getNumStone(destiny);
   const soulStone = getNumStone(soulUrge);
   const persStone = getNumStone(personality);
-  const risingStone = risingSign.includes('Eksik') ? { name: 'BEYAZ KUVARS', color: 'Şeffaf Beyaz', element: 'Tümü' } : getZodiacStone(risingSign);
+  const sunStone = getZodiacStone(sunSign);
 
   const matchedStones = [
     { name: destStone.name, reason: `Kader Sayısı (${destiny})`, color: destStone.color, element: destStone.element },
     { name: soulStone.name, reason: `Ruh Güdüsü Sayısı (${soulUrge})`, color: soulStone.color, element: soulStone.element },
     { name: persStone.name, reason: `Kişilik Sayısı (${personality})`, color: persStone.color, element: persStone.element },
-    { name: 'AY TAŞI', reason: `Yaşam Yolu (${lifePath}) & Güneş Burcu (${sunSign})`, color: 'Beyaz / Yanardöner', element: 'Su' },
-    { name: risingStone.name, reason: `Yükselen Burç (${risingSign})`, color: risingStone.color, element: risingStone.element },
+    { name: sunStone.name, reason: `Yaşam Yolu (${lifePath}) & Güneş Burcu (${sunSign})`, color: sunStone.color, element: sunStone.element },
     { name: 'KAPLAN GÖZÜ', reason: `Niyet Desteği (${intent || 'bolluk'})`, color: 'Kahverengi / Sarı', element: 'Ateş' }
   ];
 
@@ -213,7 +197,6 @@ function generateFullAnalysis(fullName, birthDateStr, hour, minute, birthPlace, 
     lifePath,
     lifePathDesc: NUMBER_DESCRIPTIONS[lifePath] || NUMBER_DESCRIPTIONS[2],
     sunSign,
-    risingSign,
     matchedStones
   };
 }
@@ -329,7 +312,6 @@ async function generateAnalysisPDF(data) {
         <tr><td>Kişilik Sayısı (${data.analysis.personality})</td><td>${data.analysis.personalityDesc}</td></tr>
         <tr><td>Yaşam Yolu (${data.analysis.lifePath})</td><td>${data.analysis.lifePathDesc}</td></tr>
         <tr><td>Güneş Burcu</td><td>${data.analysis.sunSign}</td></tr>
-        <tr><td>Yükselen Burç</td><td>${data.analysis.risingSign}</td></tr>
       </tbody>
     </table>
 
@@ -358,7 +340,7 @@ async function generateAnalysisPDF(data) {
     <div class="note-box">
       <div class="note-title">Atölye Tasarım Notu</div>
       <div class="note-text">
-        Bu özel tasarım, haritanızdaki ${data.analysis.sunSign} burcu ve ${data.analysis.risingSign.split(' ')[0]} yükselen enerjisi ile ${data.analysis.lifePath} Yaşam Yolu sayınızın hem de "${data.intent || 'bolluk'}" niyetinizin frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur ve denge getirmesini dileriz.
+        Bu özel tasarım, haritanızdaki ${data.analysis.sunSign} burcu enerjisi ile ${data.analysis.lifePath} Yaşam Yolu sayınızın hem de "${data.intent || 'bolluk'}" niyetinizin frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur ve denge getirmesini dileriz.
       </div>
     </div>
   </div>
@@ -412,7 +394,7 @@ app.post('/api/v1/calculate', async (req, res) => {
     const birthDate = (year && month && day) ? `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}` : '';
     const generatedCode = trackingCode || Math.floor(100000 + Math.random() * 900000).toString();
     const nameData = processNameInputs(firstName, lastName);
-    const dynamicAnalysis = generateFullAnalysis(nameData.fullName, birthDate, hour, minute, birthPlace, intent);
+    const dynamicAnalysis = generateFullAnalysis(nameData.fullName, birthDate, intent);
 
     const reportData = {
       fullName: nameData.fullName,
