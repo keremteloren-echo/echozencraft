@@ -24,6 +24,7 @@ const drive = google.drive({ version: 'v3', auth: oauth2Client });
 
 const transporter = nodemailer.createTransport({
   service: 'gmail',
+  family: 4, // Render SMTP IPv4 bağlantı hatasını çözen kritik ayar
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
@@ -218,7 +219,6 @@ function processNameInputs(firstName, lastName) {
   return { firstName: fName, lastName: lName, fullName, formattedFullName };
 }
 
-// PDFKit ile doğrudan güvenli PDF üretimi
 function generateAnalysisPDF(data) {
   return new Promise((resolve, reject) => {
     try {
@@ -230,17 +230,14 @@ function generateAnalysisPDF(data) {
       const stream = fs.createWriteStream(filePath);
       doc.pipe(stream);
 
-      // Renk Paleti
       const primaryColor = '#2D5A42';
       const accentColor = '#E6A100';
       const textColor = '#1E2D24';
 
-      // Başlık Rozeti
       doc.rect(40, 40, 515, 30).fill(primaryColor);
       doc.fillColor('#FFFDF0').fontSize(11).font('Helvetica-Bold').text('KISISEL NUMEROLOJI VE ANALIZ RAPORU', 40, 48, { align: 'center', width: 515 });
       doc.moveDown(2);
 
-      // Bilgi Kartı
       doc.fillColor(textColor).fontSize(10);
       doc.font('Helvetica-Bold').text('MUSTERI: ', { continued: true }).font('Helvetica').text(data.formattedFullName);
       doc.font('Helvetica-Bold').text('SIPARIS KODU: ', { continued: true }).font('Helvetica').text(`#${data.trackingCode}`);
@@ -250,7 +247,6 @@ function generateAnalysisPDF(data) {
       }
       doc.moveDown(1.5);
 
-      // Bölüm 1: Numerolojik ve Astrolojik Harita
       doc.fillColor(primaryColor).fontSize(12).font('Helvetica-Bold').text('NUMEROLOJIK VE ASTROLOJIK HARITA');
       doc.moveDown(0.5);
 
@@ -271,7 +267,6 @@ function generateAnalysisPDF(data) {
 
       doc.moveDown(1);
 
-      // Bölüm 2: Doğal Taş Koleksiyonu
       doc.fillColor(primaryColor).fontSize(12).font('Helvetica-Bold').text('ESLESEN DOGAL TAS KOLEKSIYONU');
       doc.moveDown(0.5);
 
@@ -283,7 +278,6 @@ function generateAnalysisPDF(data) {
 
       doc.moveDown(1.5);
 
-      // Atölye Tasarım Notu
       doc.rect(40, doc.y, 515, 50).fillAndStroke('#FFFDF2', accentColor);
       doc.fillColor(primaryColor).fontSize(9).font('Helvetica-Bold').text('ATOLYE TASARIM NOTU', 50, doc.y - 40);
       doc.fillColor('#2D2238').font('Helvetica').fontSize(8.5).text(
