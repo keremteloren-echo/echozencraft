@@ -3,21 +3,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const resultsCard = document.getElementById('resultsCard');
   const resultDiv = document.getElementById('result');
 
-  // 8 Haneli Benzersiz Kod Üretici (Örn: EZC-8921)
+  // Senin isteğine uygun olarak 6 Haneli Benzersiz Kod Üretici (Sadece rakam)
   function generateTrackingCode() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-      let result = 'EZC-';
-      for (let i = 0; i < 4; i++) {
-          result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
+      return Math.floor(100000 + Math.random() * 900000).toString();
   }
 
   if (form) {
     form.addEventListener('submit', async function(e) {
         e.preventDefault();
 
-        // Ad ve Soyad elemanlarını ayrı ayrı veya tek parça olarak alıyoruz
         const firstNameElem = document.getElementById('firstName');
         const lastNameElem = document.getElementById('lastName');
         const fullNameElem = document.getElementById('fullName');
@@ -30,7 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
             fullName = `${firstName} ${lastName}`.trim();
         } else if (fullNameElem) {
             fullName = fullNameElem.value.trim();
-            // Eğer fullName input'u geldiyse ad/soyad olarak ayırmayı deneyelim
             const parts = fullName.split(' ');
             if (parts.length > 1) {
                 lastName = parts.pop();
@@ -40,39 +33,41 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Doğum tarihi ister tek inputtan ister ayrı açılır menülerden gelsin kontrol edelim
-        const birthDateElem = document.getElementById('birthDate');
-        let birthDate = birthDateElem ? birthDateElem.value : '';
-        if (!birthDate) {
-          const day = document.getElementById('birthDay')?.value || '';
-          const month = document.getElementById('birthMonth')?.value || '';
-          const year = document.getElementById('birthYear')?.value || '';
-          if (day && month && year) {
-            birthDate = `${year}-${month}-${day}`;
-          }
+        // Tarih verilerini parçalı alıyoruz
+        const day = document.getElementById('birthDay')?.value || '';
+        const month = document.getElementById('birthMonth')?.value || '';
+        const year = document.getElementById('birthYear')?.value || '';
+
+        // Saat verilerini parçalı alıyoruz
+        let hourVal = document.getElementById('birthHour')?.value || '';
+        let minuteVal = document.getElementById('birthMinute')?.value || '';
+        let hour = '';
+        let minute = '';
+        
+        if (hourVal !== '' && minuteVal !== '') {
+            hour = hourVal.replace(':00', '').padStart(2, '0');
+            minute = minuteVal.padStart(2, '0');
         }
 
-        const hour = document.getElementById('birthHour')?.value || '';
-        const minute = document.getElementById('birthMinute')?.value || '';
-        const birthTime = (hour && minute) ? `${hour.replace(':00', '')}:${minute}` : '';
         const birthPlace = document.getElementById('birthPlace')?.value || '';
         const intent = document.getElementById('intent')?.value || '';
 
         const trackingCode = generateTrackingCode();
 
+        // Sunucuya gidecek veri paketini parçalı hale getirdik
         const requestPayload = {
             firstName: firstName,
             lastName: lastName,
-            fullName: fullName,
-            name: fullName,
-            birthDate: birthDate,
-            birthTime: birthTime,
+            day: day,
+            month: month,
+            year: year,
+            hour: hour,
+            minute: minute,
             birthPlace: birthPlace,
             intent: intent,
             trackingCode: trackingCode
         };
 
-        // UI'da kod gösterimi
         const displayCodeElem = document.getElementById('displayAnalysisCode');
         if (displayCodeElem) {
           displayCodeElem.innerText = trackingCode;
@@ -82,17 +77,16 @@ document.addEventListener('DOMContentLoaded', function() {
           resultDiv.innerHTML = `
               <div class="code-box">
                   <h3>Analiz Takip Kodunuz</h3>
-                  <p class="code-number"><strong>${trackingCode}</strong></p>
+                  <p class="code-number">${trackingCode}</p>
                   <small>Lütfen bu kodu bir yere not edin. Analizinizle ilgili tüm süreçlerde bu kodu kullanacaksınız.</small>
               </div>
-              <p><strong>Ad Soyad:</strong> ${fullName}</p>
-              <p><strong>Doğum Tarihi:</strong> ${birthDate}</p>
+              <p>Ad Soyad: ${fullName}</p>
+              <p>Doğum Tarihi: ${day}/${month}/${year}</p>
               <p style="color: green;">Bilgileriniz alındı. Hesaplanıyor...</p>
           `;
         }
 
         try {
-            // Server.js üzerindeki hesaplama endpoint'ine istek atıyoruz
             const response = await fetch('/api/v1/calculate', {
                 method: 'POST',
                 headers: {
@@ -106,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (response.ok && data.success) {
                 const analysis = data.analysis;
 
-                // Sonuçları HTML alanlarına basma
                 if (document.getElementById('destinyNumber')) {
                   document.getElementById('destinyNumber').innerText = analysis?.destiny ?? '-';
                 }
@@ -125,15 +118,15 @@ document.addEventListener('DOMContentLoaded', function() {
                   resultsCard.scrollIntoView({ behavior: 'smooth' });
                 }
 
-                // Mail servisi / Bildirim kaydı için ikincil istek
                 fetch('/api/numeroloji', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     firstName: firstName,
                     lastName: lastName,
-                    name: fullName,
-                    birthDate: birthDate,
+                    day: day,
+                    month: month,
+                    year: year,
                     trackingCode: trackingCode
                   })
                 }).catch(err => console.error('Mail bildirimi hatası:', err));

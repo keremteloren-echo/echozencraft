@@ -68,6 +68,580 @@
           }
         ]
       }
+    },
+    {
+      "id": "1785562265129",
+      "code": "736889",
+      "createdAt": "2026-08-01T05:31:05.129Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "Burcu Çuvalcı Özkan",
+        "birthDate": "1983-08-21",
+        "birthTime": "21:50",
+        "birthPlace": "İstanbul"
+      },
+      "intent": "huzur",
+      "analysis": {
+        "destiny": 5,
+        "destinyDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "soulUrge": 8,
+        "soulUrgeDesc": "Başarı, güç, prestij, finansal bağımsızlık ve yetkinlik arayışını simgeler.",
+        "personality": 6,
+        "personalityDesc": "Sorumluluk, sevgi, fedakarlık ve aile odaklılık.",
+        "lifePath": 5,
+        "lifePathDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "sunSign": "Aslan",
+        "risingSign": "Balık",
+        "matchedStones": [
+          {
+            "name": "FİRUZE",
+            "reason": "Kader Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "HEMATİT",
+            "reason": "Ruh Güdüsü Sayısı (8)",
+            "color": "Metalik Gri",
+            "element": "Ateş"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Kişilik Sayısı (6)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (5) & Güneş Burcu (Aslan)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Yükselen Burç (Balık)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (huzur)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785562510496",
+      "code": "701153",
+      "createdAt": "2026-08-01T05:35:10.496Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "Burcu Çuvalcı Özkan",
+        "birthDate": "1983-08-21",
+        "birthTime": "21:50",
+        "birthPlace": "İstanbul"
+      },
+      "intent": "huzur",
+      "analysis": {
+        "destiny": 5,
+        "destinyDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "soulUrge": 8,
+        "soulUrgeDesc": "Başarı, güç, prestij, finansal bağımsızlık ve yetkinlik arayışını simgeler.",
+        "personality": 6,
+        "personalityDesc": "Sorumluluk, sevgi, fedakarlık ve aile odaklılık.",
+        "lifePath": 5,
+        "lifePathDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "sunSign": "Aslan",
+        "risingSign": "Balık",
+        "matchedStones": [
+          {
+            "name": "FİRUZE",
+            "reason": "Kader Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "HEMATİT",
+            "reason": "Ruh Güdüsü Sayısı (8)",
+            "color": "Metalik Gri",
+            "element": "Ateş"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Kişilik Sayısı (6)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (5) & Güneş Burcu (Aslan)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Yükselen Burç (Balık)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (huzur)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785562520506",
+      "code": "415985",
+      "createdAt": "2026-08-01T05:35:20.506Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "Burcu Çuvalcı Özkan",
+        "birthDate": "1983-08-21",
+        "birthTime": "21:50",
+        "birthPlace": "İstanbul"
+      },
+      "intent": "sezgi",
+      "analysis": {
+        "destiny": 5,
+        "destinyDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "soulUrge": 8,
+        "soulUrgeDesc": "Başarı, güç, prestij, finansal bağımsızlık ve yetkinlik arayışını simgeler.",
+        "personality": 6,
+        "personalityDesc": "Sorumluluk, sevgi, fedakarlık ve aile odaklılık.",
+        "lifePath": 5,
+        "lifePathDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "sunSign": "Aslan",
+        "risingSign": "Balık",
+        "matchedStones": [
+          {
+            "name": "FİRUZE",
+            "reason": "Kader Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "HEMATİT",
+            "reason": "Ruh Güdüsü Sayısı (8)",
+            "color": "Metalik Gri",
+            "element": "Ateş"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Kişilik Sayısı (6)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (5) & Güneş Burcu (Aslan)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Yükselen Burç (Balık)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (sezgi)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785562749305",
+      "code": "953797",
+      "createdAt": "2026-08-01T05:39:09.305Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "emriye gümüş",
+        "birthDate": "1975-08-03",
+        "birthTime": "13:30",
+        "birthPlace": "Fethiye"
+      },
+      "intent": "kariyer",
+      "analysis": {
+        "destiny": 3,
+        "destinyDesc": "Kendini neşeyle ifade etme ve ilham verme arzusu.",
+        "soulUrge": 7,
+        "soulUrgeDesc": "Özgürce deneyimleme, analiz ve keşfetme arzusu.",
+        "personality": 5,
+        "personalityDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "lifePath": 33,
+        "lifePathDesc": "Ruhsal uyanış ve kitlelere rehberlik etme yolu.",
+        "sunSign": "Aslan",
+        "risingSign": "Akrep",
+        "matchedStones": [
+          {
+            "name": "AMAZONİT",
+            "reason": "Kader Sayısı (3)",
+            "color": "Yeşilimsi Mavi",
+            "element": "Su"
+          },
+          {
+            "name": "AMETİST",
+            "reason": "Ruh Güdüsü Sayısı (7)",
+            "color": "Mor",
+            "element": "Hava"
+          },
+          {
+            "name": "FİRUZE",
+            "reason": "Kişilik Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (33) & Güneş Burcu (Aslan)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "MALAHİT",
+            "reason": "Yükselen Burç (Akrep)",
+            "color": "Koyu Yeşil",
+            "element": "Su"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (kariyer)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785563343861",
+      "code": "801713",
+      "createdAt": "2026-08-01T05:49:03.861Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "Emriye Altın",
+        "email": "emriye.gumus07@gmail.com",
+        "birthDate": "2009-12-21",
+        "birthTime": "03:10",
+        "birthPlace": "Antalya"
+      },
+      "intent": "mutluluk",
+      "analysis": {
+        "destiny": 5,
+        "destinyDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "soulUrge": 11,
+        "soulUrgeDesc": "Yüksek sezgi, ilham, ruhsal rehberlik ve aydınlanmayı simgeler (Üstat Sezgi).",
+        "personality": 3,
+        "personalityDesc": "Kendini neşeyle ifade etme ve ilham verme arzusu.",
+        "lifePath": 8,
+        "lifePathDesc": "Başarı, güç, prestij, finansal bağımsızlık ve yetkinlik arayışını simgeler.",
+        "sunSign": "Yay",
+        "risingSign": "Terazi",
+        "matchedStones": [
+          {
+            "name": "FİRUZE",
+            "reason": "Kader Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "AMETRİN",
+            "reason": "Ruh Güdüsü Sayısı (11)",
+            "color": "Mor/Sarı",
+            "element": "Hava"
+          },
+          {
+            "name": "AMAZONİT",
+            "reason": "Kişilik Sayısı (3)",
+            "color": "Yeşilimsi Mavi",
+            "element": "Su"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (8) & Güneş Burcu (Yay)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "LAPİS LAZULİ",
+            "reason": "Yükselen Burç (Terazi)",
+            "color": "Lacivert",
+            "element": "Hava"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (mutluluk)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785563494959",
+      "code": "106263",
+      "createdAt": "2026-08-01T05:51:34.959Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "derfer fedfef",
+        "email": "emriye.gumus07@gmail.com",
+        "birthDate": "2009-11-18",
+        "birthTime": "17:50",
+        "birthPlace": "Antalya"
+      },
+      "intent": "mutluluk",
+      "analysis": {
+        "destiny": 7,
+        "destinyDesc": "Özgürce deneyimleme, analiz ve keşfetme arzusu.",
+        "soulUrge": 2,
+        "soulUrgeDesc": "Birlikteliği öğrenme ve arabulucu olma dersi.",
+        "personality": 5,
+        "personalityDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "lifePath": 22,
+        "lifePathDesc": "Büyük projeleri hayata geçirme ve evrensel inşa gücü.",
+        "sunSign": "Akrep",
+        "risingSign": "Koç",
+        "matchedStones": [
+          {
+            "name": "AMETİST",
+            "reason": "Kader Sayısı (7)",
+            "color": "Mor",
+            "element": "Hava"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Ruh Güdüsü Sayısı (2)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "FİRUZE",
+            "reason": "Kişilik Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (22) & Güneş Burcu (Akrep)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "AKİK",
+            "reason": "Yükselen Burç (Koç)",
+            "color": "Kırmızı",
+            "element": "Ateş"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (mutluluk)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785563724197",
+      "code": "172430",
+      "createdAt": "2026-08-01T05:55:24.197Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "grgtrgtrg fgfdgdf",
+        "email": "e@mail.com",
+        "birthDate": "2008-12-19",
+        "birthTime": "01:20",
+        "birthPlace": "istanbul"
+      },
+      "intent": "mutluluk",
+      "analysis": {
+        "destiny": 9,
+        "destinyDesc": "Evrensel sevgi, merhamet ve insanlığa hizmet.",
+        "soulUrge": 3,
+        "soulUrgeDesc": "Kendini neşeyle ifade etme ve ilham verme arzusu.",
+        "personality": 9,
+        "personalityDesc": "Evrensel sevgi, merhamet ve insanlığa hizmet.",
+        "lifePath": 5,
+        "lifePathDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "sunSign": "Yay",
+        "risingSign": "Başak",
+        "matchedStones": [
+          {
+            "name": "LABRADORİT",
+            "reason": "Kader Sayısı (9)",
+            "color": "Mavi/Gri",
+            "element": "Hava"
+          },
+          {
+            "name": "AMAZONİT",
+            "reason": "Ruh Güdüsü Sayısı (3)",
+            "color": "Yeşilimsi Mavi",
+            "element": "Su"
+          },
+          {
+            "name": "LABRADORİT",
+            "reason": "Kişilik Sayısı (9)",
+            "color": "Mavi/Gri",
+            "element": "Hava"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (5) & Güneş Burcu (Yay)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "YEŞİM",
+            "reason": "Yükselen Burç (Başak)",
+            "color": "Yeşil",
+            "element": "Toprak"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (mutluluk)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785563836871",
+      "code": "789034",
+      "createdAt": "2026-08-01T05:57:16.871Z",
+      "status": "PENDING",
+      "user": {
+        "fullName": "grtretre gfgdfgfd",
+        "email": "x@mail.com",
+        "birthDate": "2008-11-19",
+        "birthTime": "17:55",
+        "birthPlace": "istanbul"
+      },
+      "intent": "mutluluk",
+      "analysis": {
+        "destiny": 5,
+        "destinyDesc": "Dinamik, çekici, değişime açık ve meraklı bir profil.",
+        "soulUrge": 1,
+        "soulUrgeDesc": "Liderlik, bağımsızlık, özgünlük ve cesaret yoludur.",
+        "personality": 4,
+        "personalityDesc": "Disiplin, düzen, güvenilirlik ve pratik çözümler.",
+        "lifePath": 22,
+        "lifePathDesc": "Büyük projeleri hayata geçirme ve evrensel inşa gücü.",
+        "sunSign": "Akrep",
+        "risingSign": "Koç",
+        "matchedStones": [
+          {
+            "name": "FİRUZE",
+            "reason": "Kader Sayısı (5)",
+            "color": "Mavi/Yeşil",
+            "element": "Hava"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Ruh Güdüsü Sayısı (1)",
+            "color": "Kahverengi/Sarı",
+            "element": "Ateş"
+          },
+          {
+            "name": "LAV TAŞI",
+            "reason": "Kişilik Sayısı (4)",
+            "color": "Siyah",
+            "element": "Toprak"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (22) & Güneş Burcu (Akrep)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "AKİK",
+            "reason": "Yükselen Burç (Koç)",
+            "color": "Kırmızı",
+            "element": "Ateş"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (mutluluk)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
+    },
+    {
+      "id": "1785564075265",
+      "code": "724124",
+      "createdAt": "2026-08-01T06:01:15.265Z",
+      "status": "PENDING",
+      "user": {
+        "firstName": "Melek",
+        "lastName": "Ancın",
+        "fullName": "Melek Ancın",
+        "email": "xx@yy",
+        "birthDate": "2008-07-16",
+        "birthTime": "08:50",
+        "birthPlace": "alanya"
+      },
+      "intent": "mutluluk",
+      "analysis": {
+        "destiny": 6,
+        "destinyDesc": "Sorumluluk, sevgi, fedakarlık ve aile odaklılık.",
+        "soulUrge": 2,
+        "soulUrgeDesc": "Birlikteliği öğrenme ve arabulucu olma dersi.",
+        "personality": 22,
+        "personalityDesc": "Büyük projeleri hayata geçirme ve evrensel inşa gücü.",
+        "lifePath": 6,
+        "lifePathDesc": "Sorumluluk, sevgi, fedakarlık ve aile odaklılık.",
+        "sunSign": "Yengeç",
+        "risingSign": "Aslan",
+        "matchedStones": [
+          {
+            "name": "PEMBE KUVARS",
+            "reason": "Kader Sayısı (6)",
+            "color": "Pembe",
+            "element": "Su"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Ruh Güdüsü Sayısı (2)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Kişilik Sayısı (22)",
+            "color": "Kahverengi/Altın",
+            "element": "Ateş"
+          },
+          {
+            "name": "AY TAŞI",
+            "reason": "Yaşam Yolu (6) & Güneş Burcu (Yengeç)",
+            "color": "Beyaz / Yanardöner",
+            "element": "Su"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Yükselen Burç (Aslan)",
+            "color": "Kahverengi/Altın",
+            "element": "Ateş"
+          },
+          {
+            "name": "KAPLAN GÖZÜ",
+            "reason": "Niyet Desteği (mutluluk)",
+            "color": "Kahverengi / Sarı",
+            "element": "Ateş"
+          }
+        ]
+      }
     }
   ]
 }

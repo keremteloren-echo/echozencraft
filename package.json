@@ -8,10 +8,11 @@
     "postinstall": "PUPPETEER_CACHE_DIR=./.cache/puppeteer npx puppeteer browsers install chrome"
   },
   "dependencies": {
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^4.22.2",
     "googleapis": "^173.0.0",
+    "nodemailer": "^9.0.3",
     "pdfkit": "^0.19.1",
     "pdfkit-table": "^0.2.11",
     "puppeteer": "^25.4.0"

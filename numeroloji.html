@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
     <style>
-        /* Sadece Numeroloji Sayfasına Özel Eleman Stilleri */
         .main-content {
             padding: 40px 20px;
             display: flex;
@@ -255,6 +254,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="email">E-posta Adresiniz:</label>
+                        <input type="email" id="email" class="form-control" placeholder="ornek@mail.com" required>
+                    </div>
+
+                    <div class="form-group">
                         <label>Doğum Tarihi (Gün / Ay / Yıl):</label>
                         <div class="row-3">
                             <select id="birthDay" class="form-control" required>
@@ -355,7 +359,7 @@
                 <div class="workshop-note">
                     <h4>✨ Atölyemizden Size Özel Tasarım ✨</h4>
                     <p>
-                        Hesaplanan frekans değerleriniz ve niyetiniz doğrultusunda, yukarıdaki doğal taşlar atölyemizde sizin adınıza özenle dizilerek kişiselleştirilmiş enerji bilekliğiniz/halhalınız hazırlanır. Siparişinizle birlikte detaylı <strong>Analiz Raporunuzun QR Kodlu Basılı Kartı</strong> hediyemiz olarak paketinize eklenir.
+                        Hesaplanan frekans değerleriniz ve niyetiniz doğrultusunda, yukarıdaki doğal taşlar atölyemizde sizin adınıza özenle dizilerek kişiselleştirilmiş enerji bilekliğiniz/halhalınız hazırlanır. Siparişinizle birlikte detaylı Analiz Raporunuzun QR Kodlu Basılı Kartı hediyemiz olarak paketinize eklenir.
                     </p>
                     
                     <a id="shopierLinkBtn" href="https://www.shopier.com/echozencraft/49373371" target="_blank" class="btn-shopier">
@@ -389,25 +393,25 @@
         const BASE_SHOPIER_URL = "https://www.shopier.com/echozencraft/49373371";
 
         const STONE_STYLES = {
-            'AMAZONİT':     { bg: '#E0F2F1', color: '#004D40', dot: '#4DB6AC' },
-            'AKİK':         { bg: '#FFEBEE', color: '#B71C1C', dot: '#E57373' },
-            'AY TAŞI':      { bg: '#F5F5F5', color: '#424242', dot: '#E0E0E0' },
-            'YEŞİM':        { bg: '#E8F5E9', color: '#1B5E20', dot: '#81C784' },
+            'AMAZONİT':    { bg: '#E0F2F1', color: '#004D40', dot: '#4DB6AC' },
+            'AKİK':        { bg: '#FFEBEE', color: '#B71C1C', dot: '#E57373' },
+            'AY TAŞI':     { bg: '#F5F5F5', color: '#424242', dot: '#E0E0E0' },
+            'YEŞİM':       { bg: '#E8F5E9', color: '#1B5E20', dot: '#81C784' },
             'PEMBE KUVARS': { bg: '#FCE4EC', color: '#880E4F', dot: '#F06292' },
-            'SODALİT':      { bg: '#E8EAF6', color: '#1A237E', dot: '#7986CB' },
-            'HEMATİT':      { bg: '#ECEFF1', color: '#263238', dot: '#90A4AE' },
-            'LAPİS':        { bg: '#E3F2FD', color: '#0D47A1', dot: '#64B5F6' },
-            'KAPLAN':       { bg: '#FFF8E1', color: '#E65100', dot: '#FFB74D' },
-            'FİRUZE':       { bg: '#E0F7FA', color: '#006064', dot: '#4DD0E1' },
-            'ZÜMRÜT':       { bg: '#E8F5E9', color: '#004D40', dot: '#4CAF50' },
-            'YAKUT':        { bg: '#FFEBEE', color: '#880E4F', dot: '#C2185B' },
-            'AMETRİN':      { bg: '#F3E5F5', color: '#4A148C', dot: '#BA68C8' },
-            'UNAKİT':       { bg: '#F1F8E9', color: '#33691E', dot: '#AED581' },
-            'MALAHİT':      { bg: '#E8F5E9', color: '#1B5E20', dot: '#2E7D32' },
-            'PERU OPAL':    { bg: '#E0F7FA', color: '#00838F', dot: '#26C6DA' },
-            'AZURİT':       { bg: '#E8EAF6', color: '#1A237E', dot: '#3F51B5' },
-            'KUNZİT':       { bg: '#FCE4EC', color: '#880E4F', dot: '#EC407A' },
-            'LAV':          { bg: '#E0E0E0', color: '#212121', dot: '#616161' }
+            'SODALİT':     { bg: '#E8EAF6', color: '#1A237E', dot: '#7986CB' },
+            'HEMATİT':     { bg: '#ECEFF1', color: '#263238', dot: '#90A4AE' },
+            'LAPİS':       { bg: '#E3F2FD', color: '#0D47A1', dot: '#64B5F6' },
+            'KAPLAN':      { bg: '#FFF8E1', color: '#E65100', dot: '#FFB74D' },
+            'FİRUZE':      { bg: '#E0F7FA', color: '#006064', dot: '#4DD0E1' },
+            'ZÜMRÜT':      { bg: '#E8F5E9', color: '#004D40', dot: '#4CAF50' },
+            'YAKUT':       { bg: '#FFEBEE', color: '#880E4F', dot: '#C2185B' },
+            'AMETRİN':     { bg: '#F3E5F5', color: '#4A148C', dot: '#BA68C8' },
+            'UNAKİT':      { bg: '#F1F8E9', color: '#33691E', dot: '#AED581' },
+            'MALAHİT':     { bg: '#E8F5E9', color: '#1B5E20', dot: '#2E7D32' },
+            'PERU OPAL':   { bg: '#E0F7FA', color: '#00838F', dot: '#26C6DA' },
+            'AZURİT':      { bg: '#E8EAF6', color: '#1A237E', dot: '#3F51B5' },
+            'KUNZİT':      { bg: '#FCE4EC', color: '#880E4F', dot: '#EC407A' },
+            'LAV':         { bg: '#E0E0E0', color: '#212121', dot: '#616161' }
         };
 
         function generateNumericCode() {
@@ -436,6 +440,11 @@
         populateSelect('birthHour', 0, 23, 1, 2, ':00');
         populateSelect('birthMinute', 0, 59, 5);
 
+        // Render sunucusunu uyanık tutmak için 14 dakikada bir ping atıyoruz
+        setInterval(() => {
+            fetch('http://localhost:3000/api/keep-alive').catch(() => {});
+        }, 14 * 60 * 1000);
+
         document.getElementById('analysisForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
@@ -445,6 +454,7 @@
 
             const firstName = document.getElementById('firstName').value.trim();
             const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('email').value.trim();
             const day = document.getElementById('birthDay').value;
             const month = document.getElementById('birthMonth').value;
             const year = document.getElementById('birthYear').value;
@@ -452,11 +462,11 @@
             const hourVal = document.getElementById('birthHour').value;
             const minuteVal = document.getElementById('birthMinute').value;
 
-            let formattedTime = '';
+            let cleanHour = '';
+            let cleanMinute = '';
             if (hourVal !== '' && minuteVal !== '') {
-                const cleanHour = hourVal.replace(':00', '').padStart(2, '0');
-                const cleanMinute = minuteVal.padStart(2, '0');
-                formattedTime = `${cleanHour}:${cleanMinute}`;
+                cleanHour = hourVal.replace(':00', '').padStart(2, '0');
+                cleanMinute = minuteVal.padStart(2, '0');
             }
 
             const intentSelect = document.getElementById('intent');
@@ -465,14 +475,17 @@
             const formData = {
                 firstName: firstName,
                 lastName: lastName,
-                fullName: `${firstName} ${lastName}`,
-                birthDate: `${year}-${month}-${day}`,
-                birthTime: formattedTime,
+                email: email,
+                day: day,
+                month: month,
+                year: year,
+                hour: cleanHour,
+                minute: cleanMinute,
                 birthPlace: document.getElementById('birthPlace').value.trim(),
                 intent: intentSelect.value
             };
 
-            const apiUrl = '/api/v1/calculate';
+            const apiUrl = 'http://localhost:3000/api/v1/calculate';
 
             try {
                 const response = await fetch(apiUrl, {
@@ -529,9 +542,8 @@
 
                     let summaryText = `Güneş Burcu: ${analysis.sunSign || 'Belirtilmedi'}\n`;
                     
-                    // Yükselen Burç Değişkeni Düzeltildi (risingSign kontrolü yapılıyor)
                     const risingSignVal = analysis.risingSign || analysis.ascendant;
-                    if (risingSignVal && risingSignVal !== 'Bilinmiyor') {
+                    if (risingSignVal && risingSignVal !== 'Bilinmiyor' && !risingSignVal.includes('Eksik')) {
                         summaryText += `Yükselen Burç: ${risingSignVal}\n`;
                     } else {
                         summaryText += `Yükselen Burç: Bilinmiyor (Sağlıklı hesaplama için doğum saati ve yeri girilmelidir)\n`;

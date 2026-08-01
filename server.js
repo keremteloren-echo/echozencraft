@@ -3,6 +3,7 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 const { google } = require('googleapis');
+const nodemailer = require('nodemailer');
 require('dotenv').config();
 
 const app = express();
@@ -20,6 +21,14 @@ const REFRESH_TOKEN = process.env.REFRESH_TOKEN;
 const oauth2Client = new google.auth.OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URI);
 oauth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 const drive = google.drive({ version: 'v3', auth: oauth2Client });
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
 
 async function uploadToDrive(filePath, fileName) {
   const fileMetadata = { name: fileName, parents: [DRIVE_FOLDER_ID] };
@@ -40,6 +49,8 @@ app.use('/pdfs', express.static(pdfDir));
 
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'numeroloji.html')));
 
+app.get('/api/keep-alive', (req, res) => res.status(200).send('Alive'));
+
 function trToEn(text) {
   return (text || '')
     .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
@@ -48,16 +59,6 @@ function trToEn(text) {
     .replace(/ı/g, 'i').replace(/İ/g, 'I')
     .replace(/ö/g, 'o').replace(/Ö/g, 'O')
     .replace(/ç/g, 'c').replace(/Ç/g, 'C');
-}
-
-function parseTurkishDate(dateStr) {
-  if (!dateStr) return new Date();
-  if (dateStr.includes('-')) return new Date(dateStr);
-  const parts = dateStr.split('.');
-  if (parts.length === 3) {
-    return new Date(parts[2], parts[1] - 1, parts[0]);
-  }
-  return new Date();
 }
 
 function reduceNumber(num, keepMaster = true) {
@@ -70,7 +71,7 @@ function reduceNumber(num, keepMaster = true) {
 
 function calculateSunSign(birthDateStr) {
   if (!birthDateStr) return 'Yengeç';
-  const date = parseTurkishDate(birthDateStr);
+  const date = new Date(birthDateStr);
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
@@ -89,8 +90,10 @@ function calculateSunSign(birthDateStr) {
   return 'Yengeç';
 }
 
-function calculateRisingSign(birthDateStr, birthTimeStr) {
-  if (!birthTimeStr) return 'Başak';
+function calculateRisingSign(birthDateStr, hour, minute, birthPlace) {
+  if (!hour || !minute || !birthPlace) return 'Belirtilmedi (Saat veya Yer Eksik)';
+  
+  const birthTimeStr = `${hour}:${minute}`;
   const signs = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
   const [hours, minutes] = birthTimeStr.split(':').map(Number);
   const timeInHours = hours + (minutes || 0) / 60;
@@ -180,10 +183,10 @@ const ZODIAC_STONES = {
   'Balık': { name: 'PEMBE KUVARS', color: 'Pembe', element: 'Su' }
 };
 
-function generateFullAnalysis(fullName, birthDate, birthTime, intent) {
-  const sunSign = calculateSunSign(birthDate);
-  const risingSign = calculateRisingSign(birthDate, birthTime);
-  const lifePath = calculateLifePath(birthDate);
+function generateFullAnalysis(fullName, birthDateStr, hour, minute, birthPlace, intent) {
+  const sunSign = calculateSunSign(birthDateStr);
+  const risingSign = calculateRisingSign(birthDateStr, hour, minute, birthPlace);
+  const lifePath = calculateLifePath(birthDateStr);
   const { destiny, soulUrge, personality } = calculateNameNumerology(fullName);
 
   const getNumStone = (num) => NUMBER_STONES[num] || { name: 'AMAZONİT', color: 'Yeşilimsi Mavi', element: 'Su' };
@@ -192,7 +195,8 @@ function generateFullAnalysis(fullName, birthDate, birthTime, intent) {
   const destStone = getNumStone(destiny);
   const soulStone = getNumStone(soulUrge);
   const persStone = getNumStone(personality);
-  const risingStone = getZodiacStone(risingSign);
+  
+  const risingStone = risingSign.includes('Eksik') ? { name: 'BEYAZ KUVARS', color: 'Şeffaf Beyaz', element: 'Tümü' } : getZodiacStone(risingSign);
 
   const matchedStones = [
     { name: destStone.name, reason: `Kader Sayısı (${destiny})`, color: destStone.color, element: destStone.element },
@@ -214,37 +218,28 @@ function generateFullAnalysis(fullName, birthDate, birthTime, intent) {
     lifePathDesc: NUMBER_DESCRIPTIONS[lifePath] || NUMBER_DESCRIPTIONS[2],
     sunSign,
     risingSign,
-    intent: intent || 'Bolluk & Bereket',
     matchedStones
   };
 }
 
-function processNameInputs(reqFirstName, reqLastName, reqFullName) {
-  let firstName = (reqFirstName || '').trim();
-  let lastName = (reqLastName || '').trim();
-
-  if (!firstName && !lastName && reqFullName) {
-    const parts = reqFullName.trim().split(/\s+/);
-    if (parts.length === 1) {
-      firstName = parts[0];
-      lastName = '';
-    } else {
-      lastName = parts.pop();
-      firstName = parts.join(' ');
-    }
-  }
-
-  const fullName = `${firstName} ${lastName}`.trim() || 'Ege Buğra TELÖREN';
-  const formattedFullName = lastName ? `${firstName} ${lastName.toUpperCase()}` : firstName;
-  return { firstName, lastName, fullName, formattedFullName };
+function processNameInputs(firstName, lastName) {
+  const fName = (firstName || '').trim();
+  const lName = (lastName || '').trim();
+  const fullName = `${fName} ${lName}`.trim() || 'Ege Buğra TELÖREN';
+  const formattedFullName = lName ? `${fName} ${lName.toUpperCase()}` : fName;
+  return { firstName: fName, lastName: lName, fullName, formattedFullName };
 }
 
 function getLogoBase64() {
-  const possibleLogos = ['logo.jpeg', 'logo.jpg', 'logo.png'];
-  for (const logoName of possibleLogos) {
-    const logoPath = path.join(__dirname, logoName);
+  const possibleLogos = [
+    path.join(__dirname, 'assets', 'logo.jpeg'),
+    path.join(__dirname, 'assets', 'logo.jpg'),
+    path.join(__dirname, 'assets', 'logo.png'),
+    'logo.jpeg', 'logo.jpg', 'logo.png'
+  ];
+  for (const logoPath of possibleLogos) {
     if (fs.existsSync(logoPath)) {
-      const ext = path.extname(logoName).replace('.', '');
+      const ext = path.extname(logoPath).replace('.', '');
       const mime = ext === 'jpg' ? 'jpeg' : ext;
       return `data:image/${mime};base64,${fs.readFileSync(logoPath).toString('base64')}`;
     }
@@ -252,8 +247,24 @@ function getLogoBase64() {
   return '';
 }
 
+// Bilgisayardaki mevcut Chrome/Edge tarayıcısını otomatik bulan fonksiyon
+function getChromeExecutablePath() {
+  const paths = [
+    'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Users\\' + (process.env.USERNAME || '') + '\\AppData\\Local\\Google\\Chrome\\Application\\chrome.exe',
+    'C:\\Program Files\\Microsoft\\Edge\\Application\\msedge.exe',
+    'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe'
+  ];
+  for (const p of paths) {
+    if (fs.existsSync(p)) return p;
+  }
+  return undefined;
+}
+
 async function generateAnalysisPDF(data) {
   const logoBase64 = getLogoBase64();
+  const displayTime = data.hour && data.minute ? `${data.hour}:${data.minute}` : '';
 
   const htmlContent = `<!DOCTYPE html>
 <html lang="tr">
@@ -264,9 +275,9 @@ async function generateAnalysisPDF(data) {
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, Arial, sans-serif; background-color: #F4F7F4; color: #1E2D24; padding: 12px; }
     .container { max-width: 780px; margin: 0 auto; background: #FFFFFF; border-radius: 12px; padding: 18px 24px; border: 1.5px solid #2D5A42; }
-    .header { text-align: center; margin-bottom: 12px; }
-    .logo { max-width: 140px; height: auto; margin-bottom: 8px; }
-    .title-badge { background-color: #2D5A42; color: #FFFDF0; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 7px 18px; border-radius: 20px; display: inline-block; text-transform: uppercase; border: 2px solid #E6A100; }
+    .header { text-align: center; margin-bottom: 10px; }
+    .logo { max-width: 160px; height: auto; margin-bottom: 6px; }
+    .title-badge { background-color: #2D5A42; color: #FFFDF0; font-size: 11px; font-weight: 800; letter-spacing: 1.2px; padding: 6px 16px; border-radius: 20px; display: inline-block; text-transform: uppercase; border: 2px solid #E6A100; }
     .info-card { background-color: #F0F6F2; border: 1px solid #B8D8C6; border-radius: 10px; padding: 8px 12px; margin-bottom: 10px; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px; }
     .info-item { flex: 1 1 45%; }
     .info-label { font-size: 9px; font-weight: 800; color: #2D5A42; text-transform: uppercase; margin-bottom: 2px; }
@@ -287,8 +298,8 @@ async function generateAnalysisPDF(data) {
 <body>
   <div class="container">
     <div class="header">
-      ${logoBase64 ? `<img src="${logoBase64}" class="logo" alt="Echo Zen Craft Logo"><br>` : ''}
-      <div class="title-badge">ECHO ZEN CRAFT NUMEROLOJİ VE DOĞAL TAŞ UYUM RAPORU</div>
+      ${logoBase64 ? `<img src="${logoBase64}" class="logo" alt="Logo"><br>` : ''}
+      <div class="title-badge">KİŞİSEL NUMEROLOJİ VE ANALİZ RAPORU</div>
     </div>
 
     <div class="info-card">
@@ -302,7 +313,7 @@ async function generateAnalysisPDF(data) {
       </div>
       <div class="info-item">
         <div class="info-label">DOĞUM BİLGİLERİ</div>
-        <div class="info-value">${data.birthDate || ''} ${data.birthTime ? '- ' + data.birthTime : ''} ${data.birthPlace ? '(' + data.birthPlace + ')' : ''}</div>
+        <div class="info-value">${data.birthDate || ''} ${displayTime ? '- ' + displayTime : ''} ${data.birthPlace ? '(' + data.birthPlace + ')' : ''}</div>
       </div>
       ${data.intent ? `
       <div class="info-item">
@@ -320,12 +331,12 @@ async function generateAnalysisPDF(data) {
         </tr>
       </thead>
       <tbody>
-        <tr><td><strong>Kader Sayısı (${data.analysis.destiny})</strong></td><td>${data.analysis.destinyDesc}</td></tr>
-        <tr><td><strong>Ruh Güdüsü (${data.analysis.soulUrge})</strong></td><td>${data.analysis.soulUrgeDesc}</td></tr>
-        <tr><td><strong>Kişilik Sayısı (${data.analysis.personality})</strong></td><td>${data.analysis.personalityDesc}</td></tr>
-        <tr><td><strong>Yaşam Yolu (${data.analysis.lifePath})</strong></td><td>${data.analysis.lifePathDesc}</td></tr>
-        <tr><td><strong>Güneş Burcu</strong></td><td>${data.analysis.sunSign}</td></tr>
-        <tr><td><strong>Yükselen Burç</strong></td><td>${data.analysis.risingSign}</td></tr>
+        <tr><td>Kader Sayısı (${data.analysis.destiny})</td><td>${data.analysis.destinyDesc}</td></tr>
+        <tr><td>Ruh Güdüsü (${data.analysis.soulUrge})</td><td>${data.analysis.soulUrgeDesc}</td></tr>
+        <tr><td>Kişilik Sayısı (${data.analysis.personality})</td><td>${data.analysis.personalityDesc}</td></tr>
+        <tr><td>Yaşam Yolu (${data.analysis.lifePath})</td><td>${data.analysis.lifePathDesc}</td></tr>
+        <tr><td>Güneş Burcu</td><td>${data.analysis.sunSign}</td></tr>
+        <tr><td>Yükselen Burç</td><td>${data.analysis.risingSign}</td></tr>
       </tbody>
     </table>
 
@@ -354,16 +365,16 @@ async function generateAnalysisPDF(data) {
     <div class="note-box">
       <div class="note-title">Atölye Tasarım Notu</div>
       <div class="note-text">
-        Bu özel tasarım, haritanızdaki <strong>${data.analysis.sunSign}</strong> burcu ve <strong>${data.analysis.risingSign}</strong> yükselen enerjisi ile <strong>${data.analysis.lifePath}</strong> Yaşam Yolu sayınızın hem de "<strong>${data.intent || 'bolluk'}</strong>" niyetinizin frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur ve denge getirmesini dileriz.
+        Bu özel tasarım, haritanızdaki ${data.analysis.sunSign} burcu ve ${data.analysis.risingSign.split(' ')[0]} yükselen enerjisi ile ${data.analysis.lifePath} Yaşam Yolu sayınızın hem de "${data.intent || 'bolluk'}" niyetinizin frekansını dengelemek amacıyla atölyemizde özenle hazırlanmıştır. Tasarımınızın size uğur ve denge getirmesini dileriz.
       </div>
     </div>
   </div>
 </body>
 </html>`;
 
-  process.env.PUPPETEER_CACHE_DIR = path.join(__dirname, '.cache', 'puppeteer');
   const browser = await puppeteer.launch({
     headless: true,
+    executablePath: getChromeExecutablePath(),
     args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--single-process', '--no-zygote']
   });
   const page = await browser.newPage();
@@ -386,10 +397,23 @@ async function generateAnalysisPDF(data) {
 
 app.post('/api/v1/calculate', async (req, res) => {
   try {
-    const { firstName: reqFirstName, lastName: reqLastName, fullName: reqFullName, birthDate, birthTime, birthPlace, intent, trackingCode } = req.body;
+    const { firstName, lastName, email, day, month, year, hour, minute, birthPlace, intent, trackingCode } = req.body;
+    
+    console.log('\n--- YENİ FORM GİRİŞİ (RENDER LOG) ---');
+    console.log(`Ad Soyad: ${firstName || ''} ${lastName || ''}`);
+    console.log(`E-posta: ${email || 'Belirtilmedi'}`);
+    console.log(`Doğum Tarihi: ${day || ''}/${month || ''}/${year || ''}`);
+    console.log(`Doğum Saati: ${hour || ''}:${minute || ''}`);
+    console.log(`Doğum Yeri: ${birthPlace || ''}`);
+    console.log(`Niyet: ${intent || ''}`);
+    console.log('-------------------------------------\n');
+
+    const birthDate = (year && month && day) ? `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}` : '';
+    
     const generatedCode = trackingCode || Math.floor(100000 + Math.random() * 900000).toString();
-    const nameData = processNameInputs(reqFirstName, reqLastName, reqFullName);
-    const dynamicAnalysis = generateFullAnalysis(nameData.fullName, birthDate, birthTime, intent);
+    const nameData = processNameInputs(firstName, lastName);
+    
+    const dynamicAnalysis = generateFullAnalysis(nameData.fullName, birthDate, hour, minute, birthPlace, intent);
 
     const reportData = {
       fullName: nameData.fullName,
@@ -397,21 +421,80 @@ app.post('/api/v1/calculate', async (req, res) => {
       lastName: nameData.lastName,
       formattedFullName: nameData.formattedFullName,
       birthDate,
-      birthTime,
+      hour,
+      minute,
       birthPlace,
       intent,
       trackingCode: generatedCode,
       analysis: dynamicAnalysis
     };
 
+    try {
+        const dbPath = path.join(__dirname, 'database.json');
+        let db = { records: [] };
+
+        if (fs.existsSync(dbPath)) {
+            const rawData = fs.readFileSync(dbPath);
+            db = JSON.parse(rawData);
+        }
+
+        const newRecord = {
+            id: Date.now().toString(),
+            code: generatedCode,
+            createdAt: new Date().toISOString(),
+            status: "PENDING",
+            user: {
+                firstName: nameData.firstName,
+                lastName: nameData.lastName,
+                fullName: nameData.fullName,
+                email: email,
+                birthDate: birthDate,
+                birthTime: `${hour}:${minute}`,
+                birthPlace: birthPlace
+            },
+            intent: intent,
+            analysis: dynamicAnalysis
+        };
+
+        db.records.push(newRecord);
+        fs.writeFileSync(dbPath, JSON.stringify(db, null, 2));
+        console.log("Yedekleme başarılı: Ad, soyad ve tüm veriler database.json dosyasına yazıldı.");
+    } catch (backupError) {
+        console.error("Yedekleme sırasında hata:", backupError);
+    }
+
     (async () => {
       try {
         const { filePath, fileName } = await generateAnalysisPDF(reportData);
         console.log(`PDF kaydedildi: pdfs/${fileName}`);
-        const fileId = await uploadToDrive(filePath, fileName);
-        console.log(`Drive Yüklendi. ID: ${fileId}`);
-      } catch (pdfError) {
-        console.error('PDF/Drive hatası:', pdfError.message);
+        
+        let driveUrl = "Drive Hatası";
+        try {
+            const fileId = await uploadToDrive(filePath, fileName);
+            console.log(`Drive Yüklendi. ID: ${fileId}`);
+            driveUrl = `Dosya ID: ${fileId}`;
+        } catch(dErr) {
+             console.error("Drive yüklemesi başarısız oldu:", dErr.message);
+        }
+
+        const mailOptions = {
+          from: `"Echo Zen Craft Sistem" <${process.env.EMAIL_USER}>`,
+          to: process.env.EMAIL_USER,
+          subject: `Yeni Sipariş PDF Raporu: ${nameData.formattedFullName} - #${generatedCode}`,
+          text: `Merhaba,\n\n${nameData.formattedFullName} isimli müşteri için hazırlanan analiz raporu PDF formatında ektedir.\n\nMüşteri Adı Soyadı: ${nameData.fullName}\nMüşteri E-posta: ${email || 'Belirtilmedi'}\nDrive Durumu: ${driveUrl}\n\nBu rapor çıktı alınıp hazırlanan tasarımla birlikte gönderime hazırdır.\n\nKolay gelsin,\nEcho Zen Craft Otomasyonu`,
+          attachments: [
+            {
+              filename: fileName,
+              path: filePath
+            }
+          ]
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`E-posta başarıyla sana gönderildi.`);
+
+      } catch (processError) {
+        console.error('PDF veya E-posta işlemi sırasında genel hata:', processError.message);
       }
     })();
 
